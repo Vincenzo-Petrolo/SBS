@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "sbs_configuration.h"
 
 int main(void)
 {
@@ -8,4 +9,3 @@ int main(void)
     printf("saluti viandante\n");
     return 0;
 }
-
