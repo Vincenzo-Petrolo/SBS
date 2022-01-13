@@ -1,16 +1,18 @@
 #ifndef __SBS_CONFIGURATION__
 #define __SBS_CONFIGURATION__
 
+/*Debug levels to be used as the lvl parameter for the macro DEBUG_PRINT*/
+#define HEAVY_DEBUG 3
+#define MODERATE_DEBUG 2
+#define LIGHT_DEBUG 1
+#define NO_DEBUG 0 /*Don't use this with the macro DEBUG_PRINT!!!*/
 
-/*During development use the DEBUG_LEVEL so that it can be disabled
- * globally just by changing this parameter.
- *
- * LEVEL 3 : Heavy debugging
- * LEVEL 2 : Moderate debugging
- * LEVEL 1 : Light debugging
- * LEVEL 0 : No debugging at all
- * */
+/*Define the global debug level*/
+#define DEBUG_LEVEL HEAVY_DEBUG
 
-#define DEBUG_LEVEL 3
+#define DEBUG_PRINT(string, lvl) \
+    if (lvl <= DEBUG_LEVEL) {\
+        printf(string);\
+    }\
 
 #endif
