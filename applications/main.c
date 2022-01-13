@@ -8,4 +8,3 @@ int main(void)
     printf("saluti viandante\n");
     return 0;
 }
-
