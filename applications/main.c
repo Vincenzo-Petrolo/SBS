@@ -31,3 +31,11 @@ int main(void)
 
     return 0;
 }
+
+void process8(void *parameter)
+{
+
+
+
+    return;
+}
