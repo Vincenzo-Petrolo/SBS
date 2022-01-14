@@ -21,13 +21,22 @@ int main(void)
 
     if (process8_thread == RT_NULL) {
         rt_kprintf("[ERROR] : process8 failed to create\n");
+
+        return 1;
     }
 
     rt_err_t p8_startup_error = rt_thread_startup(process8_thread);
 
     if (p8_startup_error == RT_ERROR) {
         rt_kprintf("[ERORR] : process 8 failed to start\n");
+
+        return 1;
     }
+
+    DEBUG_PRINT("Sending mailbox to process8\n",HEAVY_DEBUG);
+    rt_ubase_t value_test = 255;
+    rt_mb_send(&p8_mailbox, (rt_ubase_t) &value_test);
+
 
     return 0;
 }
