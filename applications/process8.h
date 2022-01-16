@@ -12,9 +12,14 @@
 #define P8_MB_POOL_SIZE 128
 
 
-
 void set_brake(uint8_t value); //between 0 and 255
 
+typedef struct {
+    uint8_t humidity_threshold;
+    uint8_t proximity_threshold[2];
+    uint8_t speed_threshold[2];
+    uint8_t rpm_threshdold[2];
+} thresholds_t;
 
 void process8_entry(void *p8_mailboxp)
 {
@@ -22,6 +27,10 @@ void process8_entry(void *p8_mailboxp)
     rt_err_t result;
     uint32_t *pointer; //declare a pointer to data received
     msg_t *msg;
+    bus_state_t current_state = {0,0,0,0}; //describe the motion state of the bus
+    thresholds_t thresholds; //TODO initialize using meaningful values
+    uint8_t road_state = 0; //assume it is dry
+    uint8_t brakes;
 
     DEBUG_PRINT("process8 started\n", HEAVY_DEBUG);
 
@@ -42,9 +51,40 @@ void process8_entry(void *p8_mailboxp)
 
         msg = (msg_t *) pointer;
 
-        if (msg -> sensor == 'V') {
-            set_brake((uint8_t) msg -> value);
+        switch (msg->sensor) {
+            case 'R':
+                current_state.rpm = msg->value;
+                break;
+            case 'V':
+                current_state.speed = msg->value;
+                break;
+            case 'H':
+                current_state.humidity = msg->value;
+                break;
+            case 'P':
+                current_state.proximity = msg->value;
+                break;
+            default:
+                DEBUG_PRINT("p8 received a value from an unknown sensor\n",LIGHT_DEBUG);
+                break;
+        }
 
+        //TODO this can be avoided if we haven't updated the humidity value this cycle
+        if (current_state.humidity > thresholds.humidity_threshold) {
+            /*road is dry*/
+            road_state = 0;
+        } else {
+            /*road is wet*/
+            road_state = 1;
+        }
+
+        if (current_state.proximity < thresholds.proximity_threshold[road_state]) {
+            /*Check if the bus is in motion*/
+            if (current_state.speed > 0 && current_state.rpm > 0) {
+                /*brake depending linearly on the proximity and modulated by speed*/
+                brakes = (255-current_state.proximity)*(current_state.speed/255);
+                set_brake(brakes);
+            }
         }
     }
 
