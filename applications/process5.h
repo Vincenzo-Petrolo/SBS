@@ -1,5 +1,5 @@
-#ifndef __PROCESS8__
-#define __PROCESS8__
+#ifndef __PROCESS5__
+#define __PROCESS5__
 
 #include "sbs_configuration.h"
 #include <rtthread.h>
