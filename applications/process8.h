@@ -2,6 +2,7 @@
 #define __PROCESS8__
 
 #include "sbs_configuration.h"
+#include "custom_types.h"
 #include <rtthread.h>
 
 #define P8_STACK 1024 //1kB
@@ -41,7 +42,6 @@ void process8_entry(void *p8_mailboxp)
 
         msg = (msg_t *) pointer;
 
-        /*TODO cast the pointer to a defined type in order to access information.*/
         if (msg -> sensor == 'V') {
             set_brake((uint8_t) msg -> value);
 

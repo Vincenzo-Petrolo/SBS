@@ -2,6 +2,7 @@
 #define __PROCESS5__
 
 #include "sbs_configuration.h"
+#include "custom_types.h"
 #include <rtthread.h>
 #include <time.h>
 
