@@ -58,14 +58,14 @@ void process5_entry(void *parameter)
         if (hum != -1) {
             msg.value = hum;
             msg.sensor = 'H';
-            result = rt_mb_send(&p8_mailbox, msg);
+            result = rt_mb_send(&p8_mailbox, (rt_uint32_t)&msg);
             DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
         }
 
         if (prox != -1) {
             msg.value = prox;
             msg.sensor = 'P';
-            result = rt_mb_send(&p8_mailbox, msg);
+            result = rt_mb_send(&p8_mailbox, (rt_uint32_t)&msg);
             //DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
         }
 
@@ -84,9 +84,9 @@ void process5_entry(void *parameter)
 
         srand(time(NULL));
 
-        v=rand%10;
+        v=rand()%10;
         if (v ==0)
-            return rand%401;
+            return rand()%401;
         else
             return -1;
     }
@@ -96,9 +96,9 @@ void process5_entry(void *parameter)
 
         srand(time(NULL));
 
-        v=rand%10;
+        v=rand()%10;
         if (v ==0)
-            return rand%81;
+            return rand()%81;
         else
             return -1;
     }
@@ -108,9 +108,9 @@ void process5_entry(void *parameter)
 
         srand(time(NULL));
 
-        v=rand%10;
+        v=rand()%10;
         if (v ==0)
-            return rand%101;
+            return rand()%101;
         else
             return -1;
     }
@@ -120,9 +120,9 @@ void process5_entry(void *parameter)
 
         srand(time(NULL));
 
-        v=rand%10;
+        v=rand()%10;
         if (v ==0)
-            return rand%21;
+            return rand()%21;
         else
             return -1;
     }
