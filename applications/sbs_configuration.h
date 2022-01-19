@@ -15,4 +15,6 @@
         printf(string);\
     }\
 
+struct rt_mailbox p8_mailbox, p6_mailbox;
+
 #endif

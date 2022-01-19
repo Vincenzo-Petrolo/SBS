@@ -6,7 +6,7 @@
 #include <rtthread.h>
 
 #define P8_STACK 1024 //1kB
-#define P8_PRIORITY 1 //highest priority
+#define P8_PRIORITY 2 //lower than p6
 #define P8_TSLICE 10 //TODO verify if this is ok
 #define P8_DEADLINE 10 //ms
 #define P8_MB_POOL_SIZE 128
@@ -38,7 +38,7 @@ void process8_entry(void *p8_mailboxp)
 
         DEBUG_PRINT("Process 8 is waiting for mail\n", HEAVY_DEBUG);
 
-        result = rt_mb_recv(p8_mailboxp, (rt_ubase_t *)&pointer, 100);
+        result = rt_mb_recv(&p8_mailbox, (rt_ubase_t *)&pointer, 100);
 
         if (result != RT_EOK) {
             DEBUG_PRINT("Process8 wasn't able to receive mail\n",LIGHT_DEBUG);
