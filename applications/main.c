@@ -6,11 +6,12 @@
 #include "process5.h"
 #include "process6.h"
 #include "process8.h"
+#include "process4.h"
 
 /*Visible to others*/
 
 /*Visible to this file only*/
-static uint8_t p8_mb_pool[P8_MB_POOL_SIZE], p6_mb_pool[P6_MB_POOL_SIZE];
+static uint8_t p8_mb_pool[P8_MB_POOL_SIZE], p6_mb_pool[P6_MB_POOL_SIZE],p4_mb_pool[P4_MB_POOL_SIZE];
 
 int main() {
 
@@ -20,7 +21,7 @@ int main() {
     result  = rt_mb_init(&p8_mailbox, "p8mb", &p8_mb_pool, P8_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
 
     if (result != RT_EOK) {
-        rt_kprintf("[ERROR] : unable to initialize mailbox P8");
+        rt_kprintf("[ERROR] : unable to initialize mailbox P8\n");
 
         return 1;
     }
@@ -28,10 +29,19 @@ int main() {
     result  = rt_mb_init(&p6_mailbox, "p6mb", &p6_mb_pool, P6_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
 
     if (result != RT_EOK) {
-        rt_kprintf("[ERROR] : unable to initialize mailbox P6");
+        rt_kprintf("[ERROR] : unable to initialize mailbox P6\n");
 
         return 1;
     }
+
+    result  = rt_mb_init(&p4_mailbox, "p4mb", &p4_mb_pool, P4_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
+
+    if (result != RT_EOK) {
+            rt_kprintf("[ERROR] : unable to initialize mailbox P4\n");
+
+            return 1;
+        }
+
 
     /*All threads creation*/
     rt_thread_t process5_thread = rt_thread_create("process5",
@@ -75,6 +85,20 @@ int main() {
         return 1;
     }
 
+    rt_thread_t process4_thread = rt_thread_create("process4",
+                                                    process4_entry,
+                                                    NULL,
+                                                    P4_STACK,
+                                                    P4_PRIORITY,
+                                                    P4_TSLICE);
+
+
+    if (process4_thread == RT_NULL) {
+        rt_kprintf("[ERROR] : process4 failed to create\n");
+
+        return 1;
+    }
+
 
 
 
@@ -97,10 +121,18 @@ int main() {
 
     rt_err_t p5_startup_error = rt_thread_startup(process5_thread);
 
-        if (p5_startup_error == RT_ERROR) {
-            rt_kprintf("[ERORR] : process 5 failed to start\n");
+    if (p5_startup_error == RT_ERROR) {
+        rt_kprintf("[ERORR] : process 5 failed to start\n");
 
-            return 1;
-        }
+        return 1;
+    }
+
+    rt_err_t p4_startup_error = rt_thread_startup(process4_thread);
+
+    if (p4_startup_error == RT_ERROR) {
+        rt_kprintf("[ERORR] : process 4 failed to start\n");
+
+        return 1;
+    }
     return 0;
 }
