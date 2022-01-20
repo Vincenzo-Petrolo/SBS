@@ -21,12 +21,16 @@ int main() {
 
     if (result != RT_EOK) {
         rt_kprintf("[ERROR] : unable to initialize mailbox P8");
+
+        return 1;
     }
 
     result  = rt_mb_init(&p6_mailbox, "p6mb", &p6_mb_pool, P6_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
 
     if (result != RT_EOK) {
         rt_kprintf("[ERROR] : unable to initialize mailbox P6");
+
+        return 1;
     }
 
     /*All threads creation*/
@@ -52,11 +56,11 @@ int main() {
                                                         P6_TSLICE);
 
 
-        if (process6_thread == RT_NULL) {
-            rt_kprintf("[ERROR] : process6 failed to create\n");
+    if (process6_thread == RT_NULL) {
+        rt_kprintf("[ERROR] : process6 failed to create\n");
 
-            return 1;
-        }
+        return 1;
+    }
 
     rt_thread_t process8_thread = rt_thread_create("process8",
                                                     process8_entry,
