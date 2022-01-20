@@ -51,7 +51,7 @@ static void timeoutprox(void *prox)
     *p = prox_comp();
 }
 
-void process5_entry(void *p8_mailboxp)
+void process5_entry()
 {
 
     int rpm; //in rpm 0-400
@@ -90,34 +90,36 @@ void process5_entry(void *p8_mailboxp)
 
     if (timerprox != RT_NULL)
         rt_timer_start(timerprox);
+
     while (1) {
 
         if (rpm != -1) {
             msg.value = rpm;
             msg.sensor = 'R';
-            //result = rt_mb_send(&p6_mailbox, (rt_uint32_t)&msg);
+            result = rt_mb_send(&p6_mailbox, (rt_uint32_t)&msg);
+            result = rt_mb_send(&p8_mailbox, (rt_uint32_t)&msg);
             DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
         }
 
         if (vel != -1) {
             msg.value = vel;
             msg.sensor = 'V';
-            //result = rt_mb_send(&p6_mailbox, (rt_uint32_t)&msg);
-            result = rt_mb_send(p8_mailboxp, (rt_uint32_t)&msg);
+            result = rt_mb_send(&p6_mailbox, (rt_uint32_t)&msg);
+            result = rt_mb_send(&p8_mailbox, (rt_uint32_t)&msg);
             DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
         }
 
         if (hum != -1) {
             msg.value = hum;
             msg.sensor = 'H';
-            result = rt_mb_send(p8_mailboxp, (rt_uint32_t)&msg);
+            result = rt_mb_send(&p8_mailbox, (rt_uint32_t)&msg);
             DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
         }
 
         if (prox != -1) {
             msg.value = prox;
             msg.sensor = 'P';
-            result = rt_mb_send(p8_mailboxp, (rt_uint32_t)&msg);
+            result = rt_mb_send(&p8_mailbox, (rt_uint32_t)&msg);
             //DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
         }
 

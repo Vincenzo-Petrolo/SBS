@@ -12,7 +12,7 @@
 #define P6_MB_POOL_SIZE 128
 
 
-void process6_entry(void *p6_mailboxp)
+void process6_entry()
 {
 
     rt_err_t result;

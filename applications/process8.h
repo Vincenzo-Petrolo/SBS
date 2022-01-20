@@ -21,7 +21,7 @@ typedef struct {
     uint8_t rpm_threshdold[2];
 } thresholds_t;
 
-void process8_entry(void *p8_mailboxp)
+void process8_entry()
 {
 
     rt_err_t result;
@@ -31,6 +31,11 @@ void process8_entry(void *p8_mailboxp)
     thresholds_t thresholds; //TODO initialize using meaningful values
     uint8_t road_state = 0; //assume it is dry
     uint8_t brakes;
+
+
+    thresholds.humidity_threshold = 70;
+    thresholds.proximity_threshold[0] = 15;
+    thresholds.proximity_threshold[1] = 30;
 
     DEBUG_PRINT("process8 started\n", HEAVY_DEBUG);
 
@@ -82,7 +87,8 @@ void process8_entry(void *p8_mailboxp)
             /*Check if the bus is in motion*/
             if (current_state.speed > 0 && current_state.rpm > 0) {
                 /*brake depending linearly on the proximity and modulated by speed*/
-                brakes = (255-current_state.proximity)*(current_state.speed/255);
+                printf("%d %d\n;", current_state.speed, current_state.rpm);
+                brakes = (255-current_state.proximity)*(current_state.speed/255); //TODO add floating point cast
                 set_brake(brakes);
             }
         }
