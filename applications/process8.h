@@ -28,10 +28,9 @@ void process8_entry()
     uint32_t *pointer; //declare a pointer to data received
     msg_t *msg;
     bus_state_t current_state = {0,0,0,0}; //describe the motion state of the bus
-    thresholds_t thresholds; //TODO initialize using meaningful values
+    thresholds_t thresholds;
     uint8_t road_state = 0; //assume it is dry
     uint8_t brakes;
-
 
     thresholds.humidity_threshold = 70;
     thresholds.proximity_threshold[0] = 15;
@@ -87,8 +86,8 @@ void process8_entry()
             /*Check if the bus is in motion*/
             if (current_state.speed > 0 && current_state.rpm > 0) {
                 /*brake depending linearly on the proximity and modulated by speed*/
-                printf("%d %d\n;", current_state.speed, current_state.rpm);
-                brakes = (255-current_state.proximity)*(current_state.speed/255); //TODO add floating point cast
+                printf("%d %d\n", current_state.speed, current_state.rpm);
+                brakes = (255-current_state.proximity)*((float)current_state.speed/255);
                 set_brake(brakes);
             }
         }

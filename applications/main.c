@@ -7,6 +7,7 @@
 #include "process6.h"
 #include "process8.h"
 #include "process4.h"
+#include "process3.h"
 
 /*Visible to others*/
 
@@ -17,6 +18,9 @@ int main() {
 
     rt_err_t result;
     srand(time(NULL));
+
+
+    rt_sem_init(&sem_lock, "lock", 1, RT_IPC_FLAG_FIFO);
 
     result  = rt_mb_init(&p8_mailbox, "p8mb", &p8_mb_pool, P8_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
 
@@ -44,6 +48,20 @@ int main() {
 
 
     /*All threads creation*/
+    rt_thread_t process3_thread = rt_thread_create("process3",
+                                                    process3_entry,
+                                                    NULL,
+                                                    P3_STACK,
+                                                    P3_PRIORITY,
+                                                    P3_TSLICE);
+
+
+    if (process3_thread == RT_NULL) {
+        rt_kprintf("[ERROR] : process5 failed to create\n");
+
+        return 1;
+    }
+
     rt_thread_t process5_thread = rt_thread_create("process5",
                                                     process5_entry,
                                                     NULL,
@@ -102,6 +120,10 @@ int main() {
 
 
 
+
+
+
+
     rt_err_t p6_startup_error = rt_thread_startup(process6_thread);
 
     if (p6_startup_error == RT_ERROR) {
@@ -119,6 +141,23 @@ int main() {
         return 1;
     }
 
+    rt_err_t p4_startup_error = rt_thread_startup(process4_thread);
+
+    if (p4_startup_error == RT_ERROR) {
+        rt_kprintf("[ERORR] : process 4 failed to start\n");
+
+        return 1;
+    }
+
+    rt_err_t p3_startup_error = rt_thread_startup(process3_thread);
+
+    if (p3_startup_error == RT_ERROR) {
+        rt_kprintf("[ERORR] : process 3 failed to start\n");
+
+        return 1;
+    }
+
+
     rt_err_t p5_startup_error = rt_thread_startup(process5_thread);
 
     if (p5_startup_error == RT_ERROR) {
@@ -127,12 +166,7 @@ int main() {
         return 1;
     }
 
-    rt_err_t p4_startup_error = rt_thread_startup(process4_thread);
 
-    if (p4_startup_error == RT_ERROR) {
-        rt_kprintf("[ERORR] : process 4 failed to start\n");
 
-        return 1;
-    }
     return 0;
 }

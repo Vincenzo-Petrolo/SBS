@@ -27,12 +27,13 @@ void process4_entry(void *param)
     DEBUG_PRINT("process4 started\n", HEAVY_DEBUG);
 
     while (1) {
+
         DEBUG_PRINT("Process 4 is waiting for mail\n", HEAVY_DEBUG);
 
         result = rt_mb_recv(&p4_mailbox, (rt_ubase_t *)&pointer, 100);
 
         if (result != RT_EOK) {
-            DEBUG_PRINT("Process4 wasn't able to receive mail\n",LIGHT_DEBUG);
+            DEBUG_PRINT("Process 4 wasn't able to receive mail\n",LIGHT_DEBUG);
 
             /*Continue with next cycle*/
             continue;
