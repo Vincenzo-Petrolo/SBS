@@ -31,6 +31,9 @@
 #define __UART_H__
 
 #include <board.h>
+#define RT_USING_UART0
+#define RT_USING_UART1
+
 
 int rt_hw_uart_init(void);
 

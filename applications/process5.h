@@ -102,6 +102,7 @@ void process5_entry()
             msg.sensor = 'R';
             result = rt_mb_send(&p6_mailbox, (rt_uint32_t)&msg);
             result = rt_mb_send(&p8_mailbox, (rt_uint32_t)&msg);
+            result = rt_mb_send(&p4_mailbox, (rt_uint32_t)&msg);
             DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
         }
 

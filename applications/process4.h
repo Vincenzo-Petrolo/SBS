@@ -7,13 +7,16 @@
 #include <time.h>
 
 #define P4_STACK 4096 //4kB
-#define P4_PRIORITY 30 //lower than all the other threads
+#define P4_PRIORITY 1 //lower than all the other threads
 #define P4_TSLICE 10 //TODO verify if this is ok
 #define P4_DEADLINE 200 //ms
 #define P4_MB_POOL_SIZE 128
 
 static void send_json(uint8_t rpm, uint8_t speed, uint8_t proximity, uint8_t humidity);
 
+/*To be used only by this process*/
+#define DEVICE_NAME "uart0"
+static rt_device_t serial_monitor;
 
 /*This process is in charge of creating JSON packages sent through UART
  * connection to the monitor.*/
@@ -25,6 +28,16 @@ void process4_entry(void *param)
     rt_err_t result;
 
     DEBUG_PRINT("process4 started\n", HEAVY_DEBUG);
+    serial_monitor = rt_device_find(DEVICE_NAME);
+
+    if (serial_monitor == RT_NULL) {
+        rt_kprintf("PROCESS4 serial monitor not found, exiting\n");
+
+        return;
+    }
+
+    while (rt_device_open(serial_monitor, RT_DEVICE_FLAG_STREAM) != RT_EOK);
+    DEBUG_PRINT("Process 4 created serial device\n", HEAVY_DEBUG);
 
     while (1) {
 
@@ -34,8 +47,9 @@ void process4_entry(void *param)
 
         if (result != RT_EOK) {
             DEBUG_PRINT("Process 4 wasn't able to receive mail\n",LIGHT_DEBUG);
-
             /*Continue with next cycle*/
+            rt_kprintf("prova\n");
+
             continue;
         }
 
@@ -61,7 +75,6 @@ void process4_entry(void *param)
             DEBUG_PRINT("p4 received an unknown sensor",HEAVY_DEBUG);
             break;
         }
-
         send_json(last_rpm, last_speed, last_prox, last_hum);
 
     }
@@ -71,8 +84,15 @@ void process4_entry(void *param)
 
 static void send_json(uint8_t rpm, uint8_t speed, uint8_t proximity, uint8_t humidity)
 {
-    /*Send json packets over UART*/
-    /*use the uart port over tty to send the JSON values*/
+    /*Send json packets over UART to a serial monitor*/
+    char string[256];
+
+    sprintf(string, "RPM: %d\n"\
+                    "SPEED: %d\n"\
+                    "PROXIMITY: %d\n"\
+                    "HUMIDITY: %d\n",rpm,speed,proximity,humidity);
+
+    rt_device_write(serial_monitor, 0, string, (sizeof(string) - 1));
     return;
 }
 

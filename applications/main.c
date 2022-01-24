@@ -19,7 +19,6 @@ int main() {
     rt_err_t result;
     srand(time(NULL));
 
-
     rt_sem_init(&sem_lock, "lock", 1, RT_IPC_FLAG_FIFO);
 
     result  = rt_mb_init(&p8_mailbox, "p8mb", &p8_mb_pool, P8_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
@@ -118,12 +117,6 @@ int main() {
     }
 
 
-
-
-
-
-
-
     rt_err_t p6_startup_error = rt_thread_startup(process6_thread);
 
     if (p6_startup_error == RT_ERROR) {
@@ -149,6 +142,14 @@ int main() {
         return 1;
     }
 
+    rt_err_t p5_startup_error = rt_thread_startup(process5_thread);
+
+    if (p5_startup_error == RT_ERROR) {
+        rt_kprintf("[ERORR] : process 5 failed to start\n");
+
+        return 1;
+    }
+
     rt_err_t p3_startup_error = rt_thread_startup(process3_thread);
 
     if (p3_startup_error == RT_ERROR) {
@@ -158,13 +159,7 @@ int main() {
     }
 
 
-    rt_err_t p5_startup_error = rt_thread_startup(process5_thread);
 
-    if (p5_startup_error == RT_ERROR) {
-        rt_kprintf("[ERORR] : process 5 failed to start\n");
-
-        return 1;
-    }
 
 
 

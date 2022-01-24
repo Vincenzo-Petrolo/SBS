@@ -265,6 +265,14 @@
 
 /* security packages */
 
+#define PKG_USING_TINYCRYPT
+#define PKG_USING_TINYCRYPT_LATEST_VERSION
+#define TINY_CRYPT_MD5
+#define TINY_CRYPT_BASE64
+#define TINY_CRYPT_AES
+#define TINY_CRYPT_AES_ROM_TABLES
+#define TINY_CRYPT_SHA1
+#define TINY_CRYPT_SHA256
 /* end of security packages */
 
 /* language packages */
