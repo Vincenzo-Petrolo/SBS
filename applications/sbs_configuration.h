@@ -24,4 +24,11 @@ char shared_mem1to3[32 + 1], shared_mem3to2[32 + 1];
 
 struct rt_semaphore sem_lock;
 
+
+const struct dfs_mount_tbl mount_table[] =
+{
+    {"sd0", "/", "elm", 0, 0},
+    {0}
+};
+
 #endif
