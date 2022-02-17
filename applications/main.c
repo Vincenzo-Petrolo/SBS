@@ -21,13 +21,12 @@ static int fd = -1; //at begininning no file is open
 static void hook_of_scheduler(struct rt_thread* from, struct rt_thread* to)
 {
     rt_tick_t curr_tick = rt_tick_get();
-    char csv_line[50] = {'\0'};
 
     fd = open("timings.csv", O_WRONLY | O_APPEND | O_CREAT);
 
     if (fd>= 0) {
-        sprintf(csv_line,"%s\n", to->name );
-        write(fd, csv_line, sizeof(csv_line));
+        write(fd, to->name, sizeof(to->name));
+        write(fd, "\n", 1);
         close(fd);
     } else {
         rt_kprintf("Can't open the file\n");
