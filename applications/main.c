@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <rtthread.h>
+#include <dfs_posix.h>
+
 #include "sbs_configuration.h"
 #include "process5.h"
 #include "process6.h"
@@ -14,10 +16,37 @@
 /*Visible to this file only*/
 static uint8_t p8_mb_pool[P8_MB_POOL_SIZE], p6_mb_pool[P6_MB_POOL_SIZE],p4_mb_pool[P4_MB_POOL_SIZE];
 
+static int fd = -1; //at begininning no file is open
+
+static void hook_of_scheduler(struct rt_thread* from, struct rt_thread* to)
+{
+    rt_tick_t curr_tick = rt_tick_get();
+    char csv_line[50] = {'\0'};
+
+    fd = open("timings.csv", O_WRONLY | O_APPEND | O_CREAT);
+
+    if (fd>= 0) {
+        sprintf(csv_line,"%s\n", to->name );
+        write(fd, csv_line, sizeof(csv_line));
+        close(fd);
+    } else {
+        rt_kprintf("Can't open the file\n");
+    }
+}
+
+
 int main() {
+
 
     rt_err_t result;
     srand(time(NULL));
+
+
+    fd = open("timings.csv",  O_TRUNC);
+    close(fd);
+
+    rt_scheduler_sethook(hook_of_scheduler);
+
 
     rt_sem_init(&sem_lock, "lock", 1, RT_IPC_FLAG_FIFO);
 
@@ -157,8 +186,6 @@ int main() {
 
         return 1;
     }
-
-
 
 
 
