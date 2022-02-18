@@ -131,12 +131,19 @@ void process5_entry()
             DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
         }
 
+        /*p4 doesn't activate ever, because each time it is ready,
+        also p8 is ready, and since p8 has higher priority, it never
+        gets scheduled.*/
+
 
         if (result != RT_EOK) {
             DEBUG_PRINT("Process5 wasn't able to send mail\n",LIGHT_DEBUG);
             /*Continue with next cycle*/
             continue;
         }
+
+        /*Physical delay of polling*/
+        rt_thread_delay(1000);
 
     }
     return;
