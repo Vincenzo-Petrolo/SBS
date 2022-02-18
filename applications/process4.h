@@ -7,15 +7,16 @@
 #include <time.h>
 
 #define P4_STACK 4096 //4kB
-#define P4_PRIORITY 1 //lower than all the other threads
-#define P4_TSLICE 10 //TODO verify if this is ok
+#define P4_PRIORITY 2 
+#define P4_TSLICE 1
 #define P4_DEADLINE 200 //ms
 #define P4_MB_POOL_SIZE 128
 
 static void send_json(uint8_t rpm, uint8_t speed, uint8_t proximity, uint8_t humidity);
 
 /*To be used only by this process*/
-#define DEVICE_NAME "uart0"
+/*Use the other uart peripheral of the board, to send data*/
+#define DEVICE_NAME "uart1"
 static rt_device_t serial_monitor;
 
 /*This process is in charge of creating JSON packages sent through UART
@@ -43,12 +44,11 @@ void process4_entry(void *param)
 
         DEBUG_PRINT("Process 4 is waiting for mail\n", HEAVY_DEBUG);
 
-        result = rt_mb_recv(&p4_mailbox, (rt_ubase_t *)&pointer, 100);
+        result = rt_mb_recv(&p4_mailbox, (rt_ubase_t *)&pointer, RT_WAITING_FOREVER);
 
         if (result != RT_EOK) {
             DEBUG_PRINT("Process 4 wasn't able to receive mail\n",LIGHT_DEBUG);
             /*Continue with next cycle*/
-            rt_kprintf("prova\n");
 
             continue;
         }
@@ -91,7 +91,6 @@ static void send_json(uint8_t rpm, uint8_t speed, uint8_t proximity, uint8_t hum
                     "SPEED: %d\n"\
                     "PROXIMITY: %d\n"\
                     "HUMIDITY: %d\n",rpm,speed,proximity,humidity);
-
     rt_device_write(serial_monitor, 0, string, (sizeof(string) - 1));
     return;
 }
