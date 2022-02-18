@@ -28,7 +28,7 @@ void process6_entry()
 
             DEBUG_PRINT("Process 6 is waiting for mail\n", HEAVY_DEBUG);
 
-            result = rt_mb_recv(&p6_mailbox, (rt_ubase_t *)&pointer, 100);
+            result = rt_mb_recv(&p6_mailbox, (rt_ubase_t *)&pointer, RT_WAITING_FOREVER);
 
             if (result != RT_EOK) {
                 DEBUG_PRINT("Process6 wasn't able to receive mail\n",LIGHT_DEBUG);
