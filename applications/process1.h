@@ -8,7 +8,7 @@
 
 
 #define P1_STACK 4096 //1kB
-#define P1_PRIORITY 4 //lower than hard real time tasks
+#define P1_PRIORITY 3 //lower than hard real time tasks
 #define P1_TSLICE 10
 #define P1_DEADLINE 25 //ms
 #define P1_MB_POOL_SIZE 128
@@ -42,13 +42,14 @@ void receive_data(unsigned char *encrypted_value)
     unsigned char data_to_encrypt[sizeof(external_state_t)];
     tiny_aes_context ctx;
     uint8_t iv[16 + 1], private_key[32 + 1];
+
+
     /*Generate pseudo random values evolving with time*/
     external_state_t val = {
             rt_tick_get()%13,
             rt_tick_get()%54,
             3
     };
-
 
     /*Store the values (which are bytes) in an array, in order to perform encryption*/
     data_to_encrypt[0] = val.crossway_proximity;
@@ -62,6 +63,9 @@ void receive_data(unsigned char *encrypted_value)
     rt_memset(encrypted_value, 0x0, sizeof(encrypted_value));
     tiny_aes_setkey_enc(&ctx, (uint8_t *) private_key, 256);
     tiny_aes_crypt_cbc(&ctx, AES_ENCRYPT, sizeof(external_state_t), iv, data_to_encrypt,encrypted_value);
+
+
+    rt_thread_delay(100);
 
     return;
 }
