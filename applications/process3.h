@@ -13,7 +13,6 @@
 
 static external_state_t decrypt(void *encrypted_value);
 
-
 void process3_entry()
 {
     rt_err_t result;
@@ -33,9 +32,6 @@ void process3_entry()
             DEBUG_PRINT("Process 3 wasn't able to receive mail\n",LIGHT_DEBUG);
         } else {
             received_external_values = decrypt(encrypted_value);
-            rt_kprintf("PROCESS 3 Received: %u, %u, %u\n", received_external_values.crossway_proximity,
-                                                            received_external_values.traffic,
-                                                            received_external_values.traffic_light_status);
         }
 
 
@@ -44,20 +40,23 @@ void process3_entry()
 
 static external_state_t decrypt(void *encrypted_value)
 {
-    tiny_aes_context ctx;
-    unsigned char decrypted_value[sizeof(external_state_t)];
+    unsigned char decrypted_value[32];
     external_state_t value;
+    tiny_aes_context ctx;
 
     uint8_t iv[16 + 1];
     uint8_t private_key[32 + 1];
 
 
+    /* decrypt */
     rt_memcpy(iv, TEST_TINY_AES_IV, rt_strlen(TEST_TINY_AES_IV));
     iv[sizeof(iv) - 1] = '\0';
     rt_memcpy(private_key, TEST_TINY_AES_KEY, rt_strlen(TEST_TINY_AES_KEY));
     private_key[sizeof(private_key) - 1] = '\0';
+
+    rt_memset(decrypted_value, 0x0, sizeof(decrypted_value));
     tiny_aes_setkey_dec(&ctx, (uint8_t *) private_key, 256);
-    tiny_aes_crypt_cbc(&ctx, AES_DECRYPT, sizeof(external_state_t), iv, (unsigned char *)encrypted_value, decrypted_value);
+    tiny_aes_crypt_cbc(&ctx, AES_DECRYPT, sizeof(external_state_t), iv, encrypted_value, decrypted_value);
 
     /*Recreate the struct from encrypted bytes*/
     value.crossway_proximity = decrypted_value[0];
@@ -66,6 +65,5 @@ static external_state_t decrypt(void *encrypted_value)
 
     return value;
 }
-
 
 #endif
