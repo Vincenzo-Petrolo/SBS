@@ -23,6 +23,9 @@ static void hook_of_scheduler(struct rt_thread* from, struct rt_thread* to)
 {
 
     fd = open("timings.csv", O_WRONLY | O_APPEND | O_CREAT);
+#if HEAVY_DEBUG
+    rt_kprintf("%s -> %s\n", from->name, to->name);
+#endif
 
     if (fd>= 0) {
         write(fd, to->name, sizeof(to->name));
