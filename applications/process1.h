@@ -6,9 +6,10 @@
 #include <rtthread.h>
 #include <tiny_aes.h>
 
-#define P1_STACK 1024 //1kB
+
+#define P1_STACK 4096 //1kB
 #define P1_PRIORITY 3 //lower than hard real time tasks
-#define P1_TSLICE 10 
+#define P1_TSLICE 2
 #define P1_DEADLINE 25 //ms
 #define P1_MB_POOL_SIZE 128
 
@@ -19,6 +20,7 @@ void process1_entry()
     unsigned char value[sizeof(external_state_t)];
     rt_err_t result;
     
+
     while (1) {
 
         receive_data(value);
@@ -41,8 +43,6 @@ void receive_data(unsigned char *encrypted_value)
     uint8_t iv[16 + 1], private_key[32 + 1];
     unsigned char data_to_encrypt[sizeof(external_state_t)];
 
-    /*Simulate the wait for a new value from the receiver*/
-    //rt_thread_delay(100);
     /*Generate pseudo random values evolving with time*/
     external_state_t val = {
             rt_tick_get()%13,

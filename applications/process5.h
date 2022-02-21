@@ -6,7 +6,7 @@
 #include <rtthread.h>
 #include <time.h>
 
-#define P5_STACK 1024 //1kB
+#define P5_STACK 4096 //1kB
 #define P5_PRIORITY 3 //lower than p8 and p6
 #define P5_TSLICE 10 
 #define P5_DEADLINE 10 //ms

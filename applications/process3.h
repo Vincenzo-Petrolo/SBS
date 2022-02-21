@@ -6,7 +6,7 @@
 #include <rtthread.h>
 #include <tiny_aes.h>
 
-#define P3_STACK 1024 //1kB
+#define P3_STACK 4096 //1kB
 #define P3_PRIORITY 3 //lower than hard real time tasks
 #define P3_TSLICE 10 //TODO verify if this is ok
 #define P3_DEADLINE 25 //ms
@@ -17,9 +17,9 @@ static external_state_t decrypt(void *encrypted_value);
 void process3_entry()
 {
     rt_err_t result;
-    uint32_t *pointer;
+    unsigned char *encrypted_value;
     external_state_t received_external_values;
-
+    rt_kprintf("%d\n", sizeof(external_state_t));
 
     while (1) {
 
@@ -27,12 +27,12 @@ void process3_entry()
 
         /*Wait for a given amount of time, if no message incoming then
          * continue checking for other messages*/
-        result = rt_mb_recv(&p3_mailbox, (rt_ubase_t *)&pointer, 100);
+        result = rt_mb_recv(&p3_mailbox, (rt_ubase_t *)&encrypted_value, 100);
 
         if (result != RT_EOK) {
             DEBUG_PRINT("Process 3 wasn't able to receive mail\n",LIGHT_DEBUG);
         } else {
-            received_external_values = decrypt(pointer);
+            received_external_values = decrypt(encrypted_value);
             rt_kprintf("PROCESS 3 Received: %u, %u, %u\n", received_external_values.crossway_proximity,
                                                             received_external_values.traffic,
                                                             received_external_values.traffic_light_status);
