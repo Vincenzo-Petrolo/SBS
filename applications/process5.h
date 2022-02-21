@@ -138,7 +138,7 @@ void process5_entry()
         }
 
         /*Physical delay of polling*/
-        rt_thread_delay(1000);
+        rt_thread_delay(100);
 
     }
     return;
