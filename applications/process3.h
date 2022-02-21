@@ -26,7 +26,7 @@ void process3_entry()
 
         /*Wait for a given amount of time, if no message incoming then
          * continue checking for other messages*/
-        result = rt_mb_recv(&p3_mailbox, (rt_ubase_t *)&encrypted_value, 100);
+        result = rt_mb_recv(&p3_mailbox, (rt_ubase_t *)&encrypted_value, 1000);
 
         if (result != RT_EOK) {
             DEBUG_PRINT("Process 3 wasn't able to receive mail\n",LIGHT_DEBUG);
