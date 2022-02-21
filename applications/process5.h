@@ -8,7 +8,7 @@
 
 #define P5_STACK 1024 //1kB
 #define P5_PRIORITY 3 //lower than p8 and p6
-#define P5_TSLICE 10 //TODO verify if this is ok
+#define P5_TSLICE 10 
 #define P5_DEADLINE 10 //ms
 #define P5_MB_POOL_SIZE 128
 
@@ -130,11 +130,6 @@ void process5_entry()
             result = rt_mb_send(&p4_mailbox, (rt_uint32_t)&msg);
             DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
         }
-
-        /*p4 doesn't activate ever, because each time it is ready,
-        also p8 is ready, and since p8 has higher priority, it never
-        gets scheduled.*/
-
 
         if (result != RT_EOK) {
             DEBUG_PRINT("Process5 wasn't able to send mail\n",LIGHT_DEBUG);

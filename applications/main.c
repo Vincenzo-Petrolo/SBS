@@ -10,17 +10,17 @@
 #include "process8.h"
 #include "process4.h"
 #include "process3.h"
+#include "process1.h"
 
 /*Visible to others*/
 
 /*Visible to this file only*/
-static uint8_t p8_mb_pool[P8_MB_POOL_SIZE], p6_mb_pool[P6_MB_POOL_SIZE],p4_mb_pool[P4_MB_POOL_SIZE];
+static uint8_t p8_mb_pool[P8_MB_POOL_SIZE], p6_mb_pool[P6_MB_POOL_SIZE],p4_mb_pool[P4_MB_POOL_SIZE], p3_mb_pool[2*sizeof(external_state_t)];
 
 static int fd = -1; //at begininning no file is open
 
 static void hook_of_scheduler(struct rt_thread* from, struct rt_thread* to)
 {
-    rt_tick_t curr_tick = rt_tick_get();
 
     fd = open("timings.csv", O_WRONLY | O_APPEND | O_CREAT);
 
@@ -71,8 +71,16 @@ int main() {
             rt_kprintf("[ERROR] : unable to initialize mailbox P4\n");
 
             return 1;
-        }
+    }
 
+    /*The mailbox for process 3, is using only two entries, one for the new value and one for receiving a new value*/
+    result  = rt_mb_init(&p3_mailbox, "p3mb", &p3_mb_pool, 2*sizeof(external_state_t), RT_IPC_FLAG_FIFO);
+
+    if (result != RT_EOK) {
+            rt_kprintf("[ERROR] : unable to initialize mailbox P3\n");
+
+            return 1;
+        }
 
     /*All threads creation*/
     rt_thread_t process3_thread = rt_thread_create("process3",
@@ -144,6 +152,22 @@ int main() {
         return 1;
     }
 
+    rt_thread_t process1_thread = rt_thread_create("process1",
+                                                        process1_entry,
+                                                        NULL,
+                                                        P1_STACK,
+                                                        P1_PRIORITY,
+                                                        P1_TSLICE);
+
+
+    if (process1_thread == RT_NULL) {
+        rt_kprintf("[ERROR] : process1 failed to create\n");
+
+        return 1;
+    }
+
+
+
 
     rt_err_t p6_startup_error = rt_thread_startup(process6_thread);
 
@@ -186,7 +210,13 @@ int main() {
         return 1;
     }
 
+    rt_err_t p1_startup_error = rt_thread_startup(process1_thread);
 
+    if (p1_startup_error == RT_ERROR) {
+        rt_kprintf("[ERORR] : process 1 failed to start\n");
+
+        return 1;
+    }
 
 
     return 0;

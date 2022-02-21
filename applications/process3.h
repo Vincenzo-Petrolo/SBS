@@ -10,46 +10,62 @@
 #define P3_PRIORITY 3 //lower than hard real time tasks
 #define P3_TSLICE 10 //TODO verify if this is ok
 #define P3_DEADLINE 25 //ms
-#define P3_MB_POOL_SIZE 128
 
-
+static external_state_t decrypt(void *encrypted_value);
 
 
 void process3_entry()
 {
-    tiny_aes_context ctx;
-    uint8_t iv[16 + 1], private_key[32 + 1];
+    rt_err_t result;
+    uint32_t *pointer;
+    external_state_t received_external_values;
+
 
     while (1) {
 
-        rt_sem_take(&sem_lock, RT_WAITING_FOREVER);
+        DEBUG_PRINT("Process 3 is waiting for mail\n", HEAVY_DEBUG);
 
-        unsigned char data_to_encrypt[32 + 1];
-        unsigned char data_to_decrypt[32 + 1];
+        /*Wait for a given amount of time, if no message incoming then
+         * continue checking for other messages*/
+        result = rt_mb_recv(&p3_mailbox, (rt_ubase_t *)&pointer, 100);
 
-        rt_memcpy(data_to_encrypt, "ciao\0", 5); //TODO find out if this is working
-        /* encrypt */
-        rt_memcpy(iv, TEST_TINY_AES_IV, rt_strlen(TEST_TINY_AES_IV));
-        iv[sizeof(iv) - 1] = '\0';
-        rt_memcpy(private_key, TEST_TINY_AES_KEY, rt_strlen(TEST_TINY_AES_KEY));
-        private_key[sizeof(private_key) - 1] = '\0';
+        if (result != RT_EOK) {
+            DEBUG_PRINT("Process 3 wasn't able to receive mail\n",LIGHT_DEBUG);
+        } else {
+            received_external_values = decrypt(pointer);
+            rt_kprintf("PROCESS 3 Received: %u, %u, %u\n", received_external_values.crossway_proximity,
+                                                            received_external_values.traffic,
+                                                            received_external_values.traffic_light_status);
+        }
 
-        tiny_aes_setkey_enc(&ctx, (uint8_t *) private_key, 256);
-        tiny_aes_crypt_cbc(&ctx, AES_ENCRYPT, rt_strlen(data_to_encrypt), iv, data_to_encrypt, shared_mem3to2);
 
-        /* decrypt */
-        rt_memcpy(iv, TEST_TINY_AES_IV, rt_strlen(TEST_TINY_AES_IV));
-        iv[sizeof(iv) - 1] = '\0';
-        rt_memcpy(private_key, TEST_TINY_AES_KEY, rt_strlen(TEST_TINY_AES_KEY));
-        private_key[sizeof(private_key) - 1] = '\0';
-
-        tiny_aes_setkey_dec(&ctx, (uint8_t *) private_key, 256);
-        tiny_aes_crypt_cbc(&ctx, AES_DECRYPT, rt_strlen(shared_mem1to3), iv, shared_mem1to3, data_to_decrypt); //maybe different strlen
-
-        rt_sem_release(&sem_lock);
     }
 }
 
+static external_state_t decrypt(void *encrypted_value)
+{
+    tiny_aes_context ctx;
+    unsigned char decrypted_value[sizeof(external_state_t)];
+    external_state_t value;
+
+    uint8_t iv[16 + 1];
+    uint8_t private_key[32 + 1];
+
+
+    rt_memcpy(iv, TEST_TINY_AES_IV, rt_strlen(TEST_TINY_AES_IV));
+    iv[sizeof(iv) - 1] = '\0';
+    rt_memcpy(private_key, TEST_TINY_AES_KEY, rt_strlen(TEST_TINY_AES_KEY));
+    private_key[sizeof(private_key) - 1] = '\0';
+    tiny_aes_setkey_dec(&ctx, (uint8_t *) private_key, 256);
+    tiny_aes_crypt_cbc(&ctx, AES_DECRYPT, sizeof(external_state_t), iv, (unsigned char *)encrypted_value, decrypted_value);
+
+    /*Recreate the struct from encrypted bytes*/
+    value.crossway_proximity = decrypted_value[0];
+    value.traffic = decrypted_value[1];
+    value.traffic_light_status = decrypted_value[2];
+
+    return value;
+}
 
 
 #endif
