@@ -91,6 +91,9 @@ void process8_entry()
                 set_brake(brakes);
             }
         }
+
+        result = rt_mb_send(&p3_mailbox_bis, (rt_uint32_t)&current_state);
+
     }
 
 

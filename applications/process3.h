@@ -10,14 +10,18 @@
 #define P3_PRIORITY 3 //lower than hard real time tasks
 #define P3_TSLICE 10 //TODO verify if this is ok
 #define P3_DEADLINE 25 //ms
+#define P3_MB_POOL_SIZE 128
 
 static external_state_t decrypt(void *encrypted_value);
+static void encrypt(void *plaintext_value, unsigned char *ptr);
 
 void process3_entry()
 {
     rt_err_t result;
     unsigned char *encrypted_value;
+    unsigned char encrypted_data_to_send[32];
     external_state_t received_external_values;
+    bus_state_t internal_bus_status; //receive this from p5
     rt_kprintf("%d\n", sizeof(external_state_t));
 
     while (1) {
@@ -34,6 +38,15 @@ void process3_entry()
             received_external_values = decrypt(encrypted_value);
         }
 
+        result = rt_mb_recv(&p3_mailbox_bis, (rt_ubase_t *)&internal_bus_status, 1000);
+
+        if (result != RT_EOK) {
+            DEBUG_PRINT("Process 3 wasn't able to receive mail from process 5\n",LIGHT_DEBUG);
+        } else {
+            encrypt(&internal_bus_status, encrypted_data_to_send);
+            /*After it is encrypted, send it to p2*/
+            result = rt_mb_send(&p2_mailbox, (rt_uint32_t)encrypted_data_to_send);
+        }
 
     }
 }
@@ -64,6 +77,28 @@ static external_state_t decrypt(void *encrypted_value)
     value.traffic_light_status = decrypted_value[2];
 
     return value;
+}
+
+static void encrypt(void *plaintext_value, unsigned char *ptr)
+{
+    external_state_t value;
+    tiny_aes_context ctx;
+
+    uint8_t iv[16 + 1];
+    uint8_t private_key[32 + 1];
+
+
+    /* encrypt */
+    rt_memcpy(iv, TEST_TINY_AES_IV, rt_strlen(TEST_TINY_AES_IV));
+    iv[sizeof(iv) - 1] = '\0';
+    rt_memcpy(private_key, TEST_TINY_AES_KEY, rt_strlen(TEST_TINY_AES_KEY));
+    private_key[sizeof(private_key) - 1] = '\0';
+
+    rt_memset(ptr, 0x0, sizeof(ptr));
+    tiny_aes_setkey_enc(&ctx, (uint8_t *) private_key, 256);
+    tiny_aes_crypt_cbc(&ctx, AES_ENCRYPT, sizeof(bus_state_t), iv, plaintext_value, ptr);
+
+    return;
 }
 
 #endif

@@ -14,7 +14,8 @@
 #include "process2.h"
 
 /*Visible to this file only*/
-static uint8_t p8_mb_pool[P8_MB_POOL_SIZE], p6_mb_pool[P6_MB_POOL_SIZE],p4_mb_pool[P4_MB_POOL_SIZE], p3_mb_pool[2*sizeof(external_state_t)],p2_mb_pool[P2_MB_POOL_SIZE];
+static uint8_t p8_mb_pool[P8_MB_POOL_SIZE], p6_mb_pool[P6_MB_POOL_SIZE],p4_mb_pool[P4_MB_POOL_SIZE], p3_mb_pool[2*sizeof(external_state_t)],
+p2_mb_pool[P2_MB_POOL_SIZE],p3_mb_pool_bis[P3_MB_POOL_SIZE];
 
 static int fd = -1; //at begininning no file is open
 
@@ -27,7 +28,7 @@ static void hook_of_scheduler(struct rt_thread* from, struct rt_thread* to)
 #endif
 
     if (fd>= 0) {
-        write(fd, to->name, sizeof(to->name));
+        write(fd, to->name, rt_strlen(to->name));
         write(fd, "\n", 1);
         close(fd);
     } else {
@@ -83,6 +84,15 @@ int main() {
 
             return 1;
     }
+
+    result  = rt_mb_init(&p3_mailbox_bis, "p3mbbis", &p3_mb_pool_bis, P3_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
+
+    if (result != RT_EOK) {
+            rt_kprintf("[ERROR] : unable to initialize mailbox P3 bis\n");
+
+            return 1;
+    }
+
     result  = rt_mb_init(&p2_mailbox, "p2mb", &p2_mb_pool, P2_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
 
     if (result != RT_EOK) {
