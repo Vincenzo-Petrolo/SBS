@@ -7,7 +7,7 @@
 #include <time.h>
 
 #define P4_STACK 4096 //4kB
-#define P4_PRIORITY 2 
+#define P4_PRIORITY 6
 #define P4_TSLICE 1
 #define P4_DEADLINE 200 //ms
 #define P4_MB_POOL_SIZE 128

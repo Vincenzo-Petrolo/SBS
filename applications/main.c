@@ -11,11 +11,10 @@
 #include "process4.h"
 #include "process3.h"
 #include "process1.h"
-
-/*Visible to others*/
+#include "process2.h"
 
 /*Visible to this file only*/
-static uint8_t p8_mb_pool[P8_MB_POOL_SIZE], p6_mb_pool[P6_MB_POOL_SIZE],p4_mb_pool[P4_MB_POOL_SIZE], p3_mb_pool[2*sizeof(external_state_t)];
+static uint8_t p8_mb_pool[P8_MB_POOL_SIZE], p6_mb_pool[P6_MB_POOL_SIZE],p4_mb_pool[P4_MB_POOL_SIZE], p3_mb_pool[2*sizeof(external_state_t)],p2_mb_pool[P2_MB_POOL_SIZE];
 
 static int fd = -1; //at begininning no file is open
 
@@ -83,7 +82,14 @@ int main() {
             rt_kprintf("[ERROR] : unable to initialize mailbox P3\n");
 
             return 1;
-        }
+    }
+    result  = rt_mb_init(&p2_mailbox, "p2mb", &p2_mb_pool, P2_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
+
+    if (result != RT_EOK) {
+            rt_kprintf("[ERROR] : unable to initialize mailbox P2\n");
+
+            return 1;
+    }
 
     /*All threads creation*/
     rt_thread_t process3_thread = rt_thread_create("process3",
@@ -169,7 +175,19 @@ int main() {
         return 1;
     }
 
+    rt_thread_t process2_thread = rt_thread_create("process2",
+                                                        process2_entry,
+                                                        NULL,
+                                                        P2_STACK,
+                                                        P2_PRIORITY,
+                                                        P2_TSLICE);
 
+
+    if (process2_thread == RT_NULL) {
+        rt_kprintf("[ERROR] : process2 failed to create\n");
+
+        return 1;
+    }
 
 
     rt_err_t p6_startup_error = rt_thread_startup(process6_thread);
@@ -220,7 +238,13 @@ int main() {
 
         return 1;
     }
+    rt_err_t p2_startup_error = rt_thread_startup(process2_thread);
 
+    if (p2_startup_error == RT_ERROR) {
+        rt_kprintf("[ERORR] : process 2 failed to start\n");
+
+        return 1;
+    }
 
     return 0;
 }
