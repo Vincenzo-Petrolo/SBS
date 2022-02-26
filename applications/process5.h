@@ -96,6 +96,7 @@ void process5_entry()
          * to the msg variable, then it might happen that the content
          * of a msg is written during the read from the other thread.
          * Since msg_t type is only 16bits we could send it as a copy.
+         *TOOD compact in for loops
          */
         if (rpm != -1) {
             msg.value = rpm;
@@ -103,6 +104,8 @@ void process5_entry()
             result = rt_mb_send(&p6_mailbox, (rt_uint32_t)&msg);
             result = rt_mb_send(&p8_mailbox, (rt_uint32_t)&msg);
             result = rt_mb_send(&p4_mailbox, (rt_uint32_t)&msg);
+            result = rt_mb_send(&p7_mailbox, (rt_uint32_t)&msg);
+
             DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
         }
 
@@ -112,6 +115,8 @@ void process5_entry()
             result = rt_mb_send(&p6_mailbox, (rt_uint32_t)&msg);
             result = rt_mb_send(&p8_mailbox, (rt_uint32_t)&msg);
             result = rt_mb_send(&p4_mailbox, (rt_uint32_t)&msg);
+            result = rt_mb_send(&p7_mailbox, (rt_uint32_t)&msg);
+
             DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
         }
 
@@ -120,6 +125,8 @@ void process5_entry()
             msg.sensor = 'H';
             result = rt_mb_send(&p8_mailbox, (rt_uint32_t)&msg);
             result = rt_mb_send(&p4_mailbox, (rt_uint32_t)&msg);
+            result = rt_mb_send(&p7_mailbox, (rt_uint32_t)&msg);
+
             DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
         }
 
@@ -128,6 +135,8 @@ void process5_entry()
             msg.sensor = 'P';
             result = rt_mb_send(&p8_mailbox, (rt_uint32_t)&msg);
             result = rt_mb_send(&p4_mailbox, (rt_uint32_t)&msg);
+            result = rt_mb_send(&p7_mailbox, (rt_uint32_t)&msg);
+
             DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
         }
 

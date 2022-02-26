@@ -27,12 +27,13 @@ void process7_entry()
 
     while (1) {
 
-        DEBUG_PRINT("Process 6 is waiting for mail\n", HEAVY_DEBUG);
+        DEBUG_PRINT("Process 7 is waiting for mail\n", HEAVY_DEBUG);
 
-        result = rt_mb_recv(&p7_mailbox, (rt_ubase_t *)&pointer, RT_WAITING_FOREVER);
+        result = rt_mb_recv(&p7_mailbox, (rt_ubase_t *)&pointer, 1000);
 
         if (result != RT_EOK) {
             DEBUG_PRINT("Process7 wasn't able to receive mail\n",LIGHT_DEBUG);
+
             /*Continue with next cycle*/
             continue;
         } else {
@@ -43,25 +44,43 @@ void process7_entry()
 
         /*Receive informations over CAN from system*/
         rec = can_receive_msg();
-        /*Spread to other processes depending on the type of information*/
-        /*TOOD decide what kind of data we can receive from the system*/
+        /*Forward the received values to process 6 and process 8*/
+        rt_mb_send(&p6_mailbox, (rt_uint32_t)&rec);
+        rt_mb_send(&p8_mailbox, (rt_uint32_t)&rec);
+
     }
 }
 
 static void can_send_msg(msg_t *msg)
 {
 
-    /*More on CAN*/
-
+    /*Emulate sending over CAN*/
+    DEBUG_PRINT("Sending over CAN network\n", HEAVY_DEBUG);
     return;
 }
 
 static msg_t can_receive_msg(void)
 {
     /*Emulate receive from CAN*/
+    /*Initialize to tyre pressure*/
+    static char sensor_name = 'T';
     msg_t received_msg;
 
+    received_msg.sensor = sensor_name;
+    /*Randomize the value*/
+    received_msg.value = ((rand()%rt_tick_get()) & 0xFF00000) >> 20;
+
+    if (sensor_name == 'T') {
+        sensor_name = 'W';
+    } else if (sensor_name == 'W') {
+        sensor_name = 'O';
+    } else {
+        sensor_name = 'T';
+    }
+
     rt_thread_delay(500);
+
+    DEBUG_PRINT("Received from CAN network\n", HEAVY_DEBUG);
 
     return received_msg;
 }
