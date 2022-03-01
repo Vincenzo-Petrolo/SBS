@@ -6,7 +6,7 @@
 #include <rtthread.h>
 #include <time.h>
 
-#define P5_STACK 4096 //1kB
+#define P5_STACK 2048 //1kB
 #define P5_PRIORITY 3 //lower than p8 and p6
 #define P5_TSLICE 10 
 #define P5_DEADLINE 10 //ms
@@ -96,38 +96,47 @@ void process5_entry()
          * to the msg variable, then it might happen that the content
          * of a msg is written during the read from the other thread.
          * Since msg_t type is only 16bits we could send it as a copy.
+         *TOOD compact in for loops
          */
         if (rpm != -1) {
             msg.value = rpm;
             msg.sensor = 'R';
-            result = rt_mb_send(&p6_mailbox, (rt_uint32_t)&msg);
-            result = rt_mb_send(&p8_mailbox, (rt_uint32_t)&msg);
-            result = rt_mb_send(&p4_mailbox, (rt_uint32_t)&msg);
+            result = rt_mb_send_wait(&p6_mailbox, (rt_uint32_t)&msg,100);
+            result = rt_mb_send_wait(&p8_mailbox, (rt_uint32_t)&msg,100);
+            result = rt_mb_send_wait(&p4_mailbox, (rt_uint32_t)&msg,100);
+            result = rt_mb_send_wait(&p7_mailbox, (rt_uint32_t)&msg,100);
+
             DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
         }
 
         if (vel != -1) {
             msg.value = vel;
             msg.sensor = 'V';
-            result = rt_mb_send(&p6_mailbox, (rt_uint32_t)&msg);
-            result = rt_mb_send(&p8_mailbox, (rt_uint32_t)&msg);
-            result = rt_mb_send(&p4_mailbox, (rt_uint32_t)&msg);
+            result = rt_mb_send_wait(&p6_mailbox, (rt_uint32_t)&msg,100);
+            result = rt_mb_send_wait(&p8_mailbox, (rt_uint32_t)&msg,100);
+            result = rt_mb_send_wait(&p4_mailbox, (rt_uint32_t)&msg,100);
+            result = rt_mb_send_wait(&p7_mailbox, (rt_uint32_t)&msg,100);
+
             DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
         }
 
         if (hum != -1) {
             msg.value = hum;
             msg.sensor = 'H';
-            result = rt_mb_send(&p8_mailbox, (rt_uint32_t)&msg);
-            result = rt_mb_send(&p4_mailbox, (rt_uint32_t)&msg);
+            result = rt_mb_send_wait(&p8_mailbox, (rt_uint32_t)&msg,100);
+            result = rt_mb_send_wait(&p4_mailbox, (rt_uint32_t)&msg,100);
+            result = rt_mb_send_wait(&p7_mailbox, (rt_uint32_t)&msg,100);
+
             DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
         }
 
         if (prox != -1) {
             msg.value = prox;
             msg.sensor = 'P';
-            result = rt_mb_send(&p8_mailbox, (rt_uint32_t)&msg);
-            result = rt_mb_send(&p4_mailbox, (rt_uint32_t)&msg);
+            result = rt_mb_send_wait(&p8_mailbox, (rt_uint32_t)&msg,100);
+            result = rt_mb_send_wait(&p4_mailbox, (rt_uint32_t)&msg,100);
+            result = rt_mb_send_wait(&p7_mailbox, (rt_uint32_t)&msg,100);
+
             DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
         }
 
@@ -138,7 +147,7 @@ void process5_entry()
         }
 
         /*Physical delay of polling*/
-        rt_thread_delay(100);
+        //rt_thread_delay(100);
 
     }
     return;

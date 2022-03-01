@@ -12,12 +12,13 @@
 #include "process3.h"
 #include "process1.h"
 #include "process2.h"
+#include "process7.h"
 
 /*Visible to this file only*/
 static uint8_t p8_mb_pool[P8_MB_POOL_SIZE], p6_mb_pool[P6_MB_POOL_SIZE],p4_mb_pool[P4_MB_POOL_SIZE], p3_mb_pool[2*sizeof(external_state_t)],
-p2_mb_pool[P2_MB_POOL_SIZE],p3_mb_pool_bis[P3_MB_POOL_SIZE];
+p2_mb_pool[P2_MB_POOL_SIZE],p3_mb_pool_bis[P3_MB_POOL_SIZE], p7_mb_pool[P7_MB_POOL_SIZE];
 
-static int fd = -1; //at begininning no file is open
+static int fd = -1; //at beginning no file is open
 
 static void hook_of_scheduler(struct rt_thread* from, struct rt_thread* to)
 {
@@ -52,6 +53,7 @@ int main() {
 
     rt_sem_init(&sem_lock, "lock", 1, RT_IPC_FLAG_FIFO);
 
+    /*TODO use for loops to initialize everything in order to avoid huge file which affects readability*/
     result  = rt_mb_init(&p8_mailbox, "p8mb", &p8_mb_pool, P8_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
 
     if (result != RT_EOK) {
@@ -71,34 +73,41 @@ int main() {
     result  = rt_mb_init(&p4_mailbox, "p4mb", &p4_mb_pool, P4_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
 
     if (result != RT_EOK) {
-            rt_kprintf("[ERROR] : unable to initialize mailbox P4\n");
+        rt_kprintf("[ERROR] : unable to initialize mailbox P4\n");
 
-            return 1;
+        return 1;
     }
 
     /*The mailbox for process 3, is using only two entries, one for the new value and one for receiving a new value*/
-    result  = rt_mb_init(&p3_mailbox, "p3mb", &p3_mb_pool, 2*sizeof(external_state_t), RT_IPC_FLAG_FIFO);
+    result  = rt_mb_init(&p3_mailbox, "p3mb", &p3_mb_pool, P3_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
 
     if (result != RT_EOK) {
-            rt_kprintf("[ERROR] : unable to initialize mailbox P3\n");
+        rt_kprintf("[ERROR] : unable to initialize mailbox P3\n");
 
-            return 1;
+        return 1;
     }
 
     result  = rt_mb_init(&p3_mailbox_bis, "p3mbbis", &p3_mb_pool_bis, P3_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
 
     if (result != RT_EOK) {
-            rt_kprintf("[ERROR] : unable to initialize mailbox P3 bis\n");
+        rt_kprintf("[ERROR] : unable to initialize mailbox P3 bis\n");
 
-            return 1;
+        return 1;
     }
 
     result  = rt_mb_init(&p2_mailbox, "p2mb", &p2_mb_pool, P2_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
 
     if (result != RT_EOK) {
-            rt_kprintf("[ERROR] : unable to initialize mailbox P2\n");
+        rt_kprintf("[ERROR] : unable to initialize mailbox P2\n");
 
-            return 1;
+        return 1;
+    }
+    result  = rt_mb_init(&p7_mailbox, "p7mb", &p7_mb_pool, P7_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
+
+    if (result != RT_EOK) {
+        rt_kprintf("[ERROR] : unable to initialize mailbox P7\n");
+
+        return 1;
     }
 
     /*All threads creation*/
@@ -199,7 +208,21 @@ int main() {
         return 1;
     }
 
+    rt_thread_t process7_thread = rt_thread_create("process7",
+                                                            process7_entry,
+                                                            NULL,
+                                                            P7_STACK,
+                                                            P7_PRIORITY,
+                                                            P7_TSLICE);
 
+
+    if (process7_thread == RT_NULL) {
+        rt_kprintf("[ERROR] : process7 failed to create\n");
+
+        return 1;
+    }
+
+#if 1
     rt_err_t p6_startup_error = rt_thread_startup(process6_thread);
 
     if (p6_startup_error == RT_ERROR) {
@@ -224,7 +247,7 @@ int main() {
 
         return 1;
     }
-
+#endif
     rt_err_t p5_startup_error = rt_thread_startup(process5_thread);
 
     if (p5_startup_error == RT_ERROR) {
@@ -232,7 +255,7 @@ int main() {
 
         return 1;
     }
-
+#if 1
     rt_err_t p3_startup_error = rt_thread_startup(process3_thread);
 
     if (p3_startup_error == RT_ERROR) {
@@ -240,7 +263,9 @@ int main() {
 
         return 1;
     }
-
+#endif
+#if 1
+    /**The error is in p1 */
     rt_err_t p1_startup_error = rt_thread_startup(process1_thread);
 
     if (p1_startup_error == RT_ERROR) {
@@ -248,6 +273,10 @@ int main() {
 
         return 1;
     }
+#endif
+
+#if 1
+
     rt_err_t p2_startup_error = rt_thread_startup(process2_thread);
 
     if (p2_startup_error == RT_ERROR) {
@@ -256,5 +285,13 @@ int main() {
         return 1;
     }
 
+    rt_err_t p7_startup_error = rt_thread_startup(process7_thread);
+
+    if (p7_startup_error == RT_ERROR) {
+        rt_kprintf("[ERORR] : process 7 failed to start\n");
+
+        return 1;
+    }
+#endif
     return 0;
 }

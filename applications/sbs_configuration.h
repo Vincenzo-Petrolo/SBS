@@ -9,7 +9,7 @@
 #define NO_DEBUG 0 /*Don't use this with the macro DEBUG_PRINT!!!*/
 
 /*Define the global debug level*/
-#define DEBUG_LEVEL HEAVY_DEBUG
+#define DEBUG_LEVEL LIGHT_DEBUG
 
 #define DEBUG_PRINT(string, lvl) \
     if (lvl <= DEBUG_LEVEL) {\
@@ -19,7 +19,7 @@
 #define TEST_TINY_AES_IV  "0123456789ABCDEF"
 #define TEST_TINY_AES_KEY "0123456789ABCDEF0123456789ABCDEF"
 
-struct rt_mailbox p8_mailbox, p6_mailbox, p4_mailbox, p3_mailbox, p2_mailbox, p3_mailbox_bis;
+struct rt_mailbox p8_mailbox, p6_mailbox, p4_mailbox, p3_mailbox, p2_mailbox, p3_mailbox_bis, p7_mailbox;
 
 char shared_mem1to3[32 + 1], shared_mem3to2[32 + 1];
 
