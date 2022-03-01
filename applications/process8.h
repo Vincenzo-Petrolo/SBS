@@ -5,7 +5,7 @@
 #include "custom_types.h"
 #include <rtthread.h>
 
-#define P8_STACK 4096 //1kB
+#define P8_STACK 2048 //1kB
 #define P8_PRIORITY 2 //lower than p6
 #define P8_TSLICE 100 //TODO verify if this is ok
 #define P8_DEADLINE 10 //ms

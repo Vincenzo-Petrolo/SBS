@@ -5,7 +5,7 @@
 #include "custom_types.h"
 #include <rtthread.h>
 
-#define P6_STACK 4096 //1kB
+#define P6_STACK 2048 //1kB
 #define P6_PRIORITY 1 //highest priority
 #define P6_TSLICE 10 //TODO verify if this is ok
 #define P6_DEADLINE 15 //ms

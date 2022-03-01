@@ -6,7 +6,7 @@
 #include <rtthread.h>
 #include <tiny_aes.h>
 
-#define P3_STACK 4096 //1kB
+#define P3_STACK 2048 //1kB
 #define P3_PRIORITY 3 //lower than hard real time tasks
 #define P3_TSLICE 10 //TODO verify if this is ok
 #define P3_DEADLINE 25 //ms

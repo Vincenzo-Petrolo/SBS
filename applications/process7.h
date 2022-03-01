@@ -5,7 +5,7 @@
 #include "custom_types.h"
 #include <rtthread.h>
 
-#define P7_STACK 4096 //1kB
+#define P7_STACK 2048 //1kB
 #define P7_PRIORITY 3 //highest priority
 #define P7_TSLICE 10 //TODO verify if this is ok
 #define P7_DEADLINE 15 //ms
@@ -26,7 +26,6 @@ void process7_entry()
 
 
     while (1) {
-
         DEBUG_PRINT("Process 7 is waiting for mail\n", HEAVY_DEBUG);
 
         result = rt_mb_recv(&p7_mailbox, (rt_ubase_t *)&pointer, 1000);
@@ -78,7 +77,7 @@ static msg_t can_receive_msg(void)
         sensor_name = 'T';
     }
 
-    rt_thread_delay(500);
+    //rt_thread_delay(500);
 
     DEBUG_PRINT("Received from CAN network\n", HEAVY_DEBUG);
 

@@ -7,7 +7,7 @@
 #include <tiny_aes.h>
 
 
-#define P2_STACK 4096 //1kB
+#define P2_STACK 2048 //1kB
 #define P2_PRIORITY 6 //lower than firm and hard
 #define P2_TSLICE 10
 #define P2_DEADLINE 25 //ms
@@ -40,9 +40,7 @@ void process2_entry()
 
 void transmit_data(unsigned char *encrypted_value)
 {
-
-
-    rt_thread_delay(100);
+    //rt_thread_delay(100);
 
     return;
 }

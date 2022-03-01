@@ -9,7 +9,7 @@
 #define NO_DEBUG 0 /*Don't use this with the macro DEBUG_PRINT!!!*/
 
 /*Define the global debug level*/
-#define DEBUG_LEVEL HEAVY_DEBUG
+#define DEBUG_LEVEL LIGHT_DEBUG
 
 #define DEBUG_PRINT(string, lvl) \
     if (lvl <= DEBUG_LEVEL) {\
