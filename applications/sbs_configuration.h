@@ -56,7 +56,6 @@ uint8_t check_deadline(rt_tick_t next_deadline)
     rt_tick_t curr_time = rt_tick_get();
 
     if (curr_time > next_deadline) {
-        rt_kprintf("Missed deadline for %u ticks\n", (curr_time - next_deadline));
 
         return DEADLINE_MISS;
     }
@@ -68,6 +67,11 @@ uint8_t check_deadline(rt_tick_t next_deadline)
 rt_tick_t get_next_deadline(rt_tick_t curr_deadline, rt_tick_t process_deadline)
 {
     return curr_deadline + process_deadline;
+}
+
+rt_tick_t ms2ticks(int milliseconds)
+{
+    return RT_TICK_PER_SECOND/1000*milliseconds;
 }
 
 #endif

@@ -49,6 +49,9 @@ int main() {
     fd = open(TIMESTAMP_FILENAME, O_TRUNC);
     close(fd);
 
+    /*If using deadline testing, comment out this otherwise it will
+     * use all the bandwidth during the preemption moments and cause
+     * all other tasks to miss their deadlines.*/
     rt_scheduler_sethook(hook_of_scheduler);
 
 

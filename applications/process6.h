@@ -6,7 +6,7 @@
 #include <rtthread.h>
 
 #define P6_STACK 4096 //1kB
-#define P6_PRIORITY 1 //highest priority
+#define P6_PRIORITY 2 //highest priority
 #define P6_TSLICE 10 //TODO verify if this is ok
 #define P6_DEADLINE_MS 15 //ms
 #define P6_DEADLINE_TICKS RT_TICK_PER_SECOND/1000*P6_DEADLINE_MS
@@ -32,9 +32,9 @@ void process6_entry()
 
             DEBUG_PRINT("Process 6 is waiting for mail\n", HEAVY_DEBUG);
 
-            /**TODO remove the waiting forever, maybe compute number of ticks given the max
-             * amount of time it is allowed to wait.*/
-            result = rt_mb_recv(&p6_mailbox, (rt_ubase_t *)&pointer, RT_WAITING_FOREVER);
+            /*Limit the wait time to 5ms at most, then if no data has arrived
+             * make a decision*/
+            result = rt_mb_recv(&p6_mailbox, (rt_ubase_t *)&pointer, ms2ticks(1));
 
             if (result != RT_EOK) {
                 DEBUG_PRINT("Process6 wasn't able to receive mail\n",LIGHT_DEBUG);

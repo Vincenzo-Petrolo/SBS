@@ -6,7 +6,7 @@
 #include <rtthread.h>
 
 #define P8_STACK 4096 //1kB
-#define P8_PRIORITY 2 //lower than p6
+#define P8_PRIORITY 1 //lower than p6
 #define P8_TSLICE 100 //TODO verify if this is ok
 #define P8_DEADLINE_MS 10 //ms
 #define P8_DEADLINE_TICKS RT_TICK_PER_SECOND/1000*P8_DEADLINE_MS
@@ -46,8 +46,8 @@ void process8_entry()
 
         DEBUG_PRINT("Process 8 is waiting for mail\n", HEAVY_DEBUG);
 
-        /**TODO remove the waiting forever*/
-        result = rt_mb_recv(&p8_mailbox, (rt_ubase_t *)&pointer, RT_WAITING_FOREVER);
+        /**Wait for 3ms at most and then make a decision*/
+        result = rt_mb_recv(&p8_mailbox, (rt_ubase_t *)&pointer, ms2ticks(3));
 
         if (result != RT_EOK) {
             DEBUG_PRINT("Process8 wasn't able to receive mail\n",LIGHT_DEBUG);
