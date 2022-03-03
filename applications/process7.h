@@ -5,10 +5,11 @@
 #include "custom_types.h"
 #include <rtthread.h>
 
-#define P7_STACK 2048 //1kB
+#define P7_STACK 4096 //1kB
 #define P7_PRIORITY 3 //highest priority
 #define P7_TSLICE 10 //TODO verify if this is ok
-#define P7_DEADLINE 15 //ms
+#define P7_DEADLINE_MS 15 //ms
+#define P7_DEADLINE_TICKS RT_TICK_PER_SECOND/1000*P7_DEADLINE_MS
 #define P7_MB_POOL_SIZE 128
 
 static void can_send_msg(msg_t *msg);
@@ -21,6 +22,10 @@ void process7_entry()
     uint32_t *pointer; //declare a pointer to data received
     msg_t *msg;
     msg_t rec;
+#ifdef DEADLINE_TESTING
+    /*Initialize deadline*/
+    rt_tick_t next_deadline = deadline_init(P7_DEADLINE_TICKS);
+#endif
 
     DEBUG_PRINT("process7 started\n", HEAVY_DEBUG);
 
@@ -46,7 +51,14 @@ void process7_entry()
         /*Forward the received values to process 6 and process 8*/
         rt_mb_send(&p6_mailbox, (rt_uint32_t)&rec);
         rt_mb_send(&p8_mailbox, (rt_uint32_t)&rec);
+#ifdef DEADLINE_TESTING
+        /*Online deadline testing*/
+        if (check_deadline(next_deadline) == DEADLINE_MISS) {
+            rt_kprintf("[!!WARNING!!] Process 7 missed the deadline!\n");
+        }
 
+        next_deadline = get_next_deadline(next_deadline, P7_DEADLINE_TICKS);
+#endif
     }
 }
 

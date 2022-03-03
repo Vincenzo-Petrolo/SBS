@@ -9,7 +9,8 @@
 #define P4_STACK 4096 //4kB
 #define P4_PRIORITY 6
 #define P4_TSLICE 1
-#define P4_DEADLINE 200 //ms
+#define P4_DEADLINE_MS 200 //ms
+#define P4_DEADLINE_TICKS RT_TICK_PER_SECOND/1000*P4_DEADLINE_MS
 #define P4_MB_POOL_SIZE 128
 
 static void send_json(uint8_t rpm, uint8_t speed, uint8_t proximity, uint8_t humidity);
@@ -27,7 +28,10 @@ void process4_entry(void *param)
     msg_t *msg;
     uint8_t last_rpm,last_speed,last_hum,last_prox;
     rt_err_t result;
-
+#ifdef DEADLINE_TESTING
+    /*Initialize deadline*/
+    rt_tick_t next_deadline = deadline_init(P4_DEADLINE_TICKS);
+#endif
     DEBUG_PRINT("process4 started\n", HEAVY_DEBUG);
     serial_monitor = rt_device_find(DEVICE_NAME);
 
@@ -76,7 +80,14 @@ void process4_entry(void *param)
             break;
         }
         send_json(last_rpm, last_speed, last_prox, last_hum);
+#ifdef DEADLINE_TESTING
+        /*Online deadline testing*/
+        if (check_deadline(next_deadline) == DEADLINE_MISS) {
+            rt_kprintf("[!!WARNING!!] Process 4 missed the deadline!\n");
+        }
 
+        next_deadline = get_next_deadline(next_deadline, P4_DEADLINE_TICKS);
+#endif
     }
     return;
 }

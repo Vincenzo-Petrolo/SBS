@@ -6,10 +6,11 @@
 #include <rtthread.h>
 #include <tiny_aes.h>
 
-#define P3_STACK 2048 //1kB
+#define P3_STACK 4096 //1kB
 #define P3_PRIORITY 3 //lower than hard real time tasks
 #define P3_TSLICE 10 //TODO verify if this is ok
-#define P3_DEADLINE 25 //ms
+#define P3_DEADLINE_MS 25 //ms
+#define P3_DEADLINE_TICKS RT_TICK_PER_SECOND/1000*P3_DEADLINE_MS
 #define P3_MB_POOL_SIZE 128
 
 static external_state_t decrypt(void *encrypted_value);
@@ -22,8 +23,10 @@ void process3_entry()
     unsigned char encrypted_data_to_send[32];
     external_state_t received_external_values;
     bus_state_t internal_bus_status; //receive this from p5
-    rt_kprintf("%d\n", sizeof(external_state_t));
-
+#ifdef DEADLINE_TESTING
+    /*Initialize deadline*/
+    rt_tick_t next_deadline = deadline_init(P3_DEADLINE_TICKS);
+#endif
     while (1) {
 
         DEBUG_PRINT("Process 3 is waiting for mail\n", HEAVY_DEBUG);
@@ -47,7 +50,14 @@ void process3_entry()
             /*After it is encrypted, send it to p2*/
             result = rt_mb_send(&p2_mailbox, (rt_uint32_t)encrypted_data_to_send);
         }
+#ifdef DEADLINE_TESTING
+        /*Online deadline testing*/
+        if (check_deadline(next_deadline) == DEADLINE_MISS) {
+            rt_kprintf("[!!WARNING!!] Process 3 missed the deadline!\n");
+        }
 
+        next_deadline = get_next_deadline(next_deadline, P3_DEADLINE_TICKS);
+#endif
     }
 }
 

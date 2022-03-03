@@ -5,12 +5,12 @@
 #include "custom_types.h"
 #include <rtthread.h>
 
-#define P6_STACK 2048 //1kB
+#define P6_STACK 4096 //1kB
 #define P6_PRIORITY 1 //highest priority
 #define P6_TSLICE 10 //TODO verify if this is ok
-#define P6_DEADLINE 15 //ms
+#define P6_DEADLINE_MS 15 //ms
+#define P6_DEADLINE_TICKS RT_TICK_PER_SECOND/1000*P6_DEADLINE_MS
 #define P6_MB_POOL_SIZE 128
-
 
 void process6_entry()
 {
@@ -21,6 +21,10 @@ void process6_entry()
     uint8_t current_rpm = 0;
     uint8_t current_speed = 0;
     uint8_t ABS_state = 0;
+#ifdef DEADLINE_TESTING
+    /*Initialize deadline*/
+    rt_tick_t next_deadline = deadline_init(P6_DEADLINE_TICKS);
+#endif
 
     DEBUG_PRINT("process6 started\n", HEAVY_DEBUG);
 
@@ -28,6 +32,8 @@ void process6_entry()
 
             DEBUG_PRINT("Process 6 is waiting for mail\n", HEAVY_DEBUG);
 
+            /**TODO remove the waiting forever, maybe compute number of ticks given the max
+             * amount of time it is allowed to wait.*/
             result = rt_mb_recv(&p6_mailbox, (rt_ubase_t *)&pointer, RT_WAITING_FOREVER);
 
             if (result != RT_EOK) {
@@ -52,11 +58,20 @@ void process6_entry()
 
             if (current_speed > 10 && current_rpm == 0) {
                 ABS_state = 1;
-                rt_kprintf("[ABS ACTIVE]\n");
+                //rt_kprintf("[ABS ACTIVE]\n");
             }
             else {
                 ABS_state = 0;
             }
+
+#ifdef DEADLINE_TESTING
+        /*Online deadline testing*/
+        if (check_deadline(next_deadline) == DEADLINE_MISS) {
+            rt_kprintf("[!!WARNING!!] Process 6 missed the deadline!\n");
+        }
+
+        next_deadline = get_next_deadline(next_deadline, P6_DEADLINE_TICKS);
+#endif
         }
 }
 

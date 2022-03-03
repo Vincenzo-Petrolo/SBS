@@ -7,10 +7,11 @@
 #include <tiny_aes.h>
 
 
-#define P1_STACK 2048 //1kB
+#define P1_STACK 4096 //1kB
 #define P1_PRIORITY 3 //lower than hard real time tasks
 #define P1_TSLICE 10
-#define P1_DEADLINE 25 //ms
+#define P1_DEADLINE_MS 25
+#define P1_DEADLINE_TICKS RT_TICK_PER_SECOND/1000*P1_DEADLINE_MS
 #define P1_MB_POOL_SIZE 128
 
 void receive_data(unsigned char *encrypted_value);
@@ -18,6 +19,10 @@ void receive_data(unsigned char *encrypted_value);
 void process1_entry()
 {
     unsigned char encrypted_value[32];
+#ifdef DEADLINE_TESTING
+    /*Initialize deadline*/
+    rt_tick_t next_deadline = deadline_init(P1_DEADLINE_TICKS);
+#endif
 
     rt_err_t result;
 
@@ -27,7 +32,7 @@ void process1_entry()
         receive_data(encrypted_value);
 
         /*Send data to p3 waiting for it to empty if it is full*/
-        result = rt_mb_send_wait(&p3_mailbox, (rt_uint32_t)encrypted_value, 1000);
+        result = rt_mb_send_wait(&p3_mailbox, (rt_uint32_t)encrypted_value, 100);
         /*If timeout is reached or error encountered then receive new data, because this is a firm realtime task*/
         if (result == -RT_ETIMEOUT) {
             DEBUG_PRINT("P1 reached timeout waiting for p3 to empty", LIGHT_DEBUG);
@@ -38,6 +43,14 @@ void process1_entry()
 
             continue;
         }
+#ifdef DEADLINE_TESTING
+        /*Online deadline testing*/
+        if (check_deadline(next_deadline) == DEADLINE_MISS) {
+            rt_kprintf("[!!WARNING!!] Process 1 missed the deadline!\n");
+        }
+
+        next_deadline = get_next_deadline(next_deadline, P1_DEADLINE_TICKS);
+#endif
     }
 }
 

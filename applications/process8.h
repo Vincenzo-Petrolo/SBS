@@ -5,12 +5,12 @@
 #include "custom_types.h"
 #include <rtthread.h>
 
-#define P8_STACK 2048 //1kB
+#define P8_STACK 4096 //1kB
 #define P8_PRIORITY 2 //lower than p6
 #define P8_TSLICE 100 //TODO verify if this is ok
-#define P8_DEADLINE 10 //ms
+#define P8_DEADLINE_MS 10 //ms
+#define P8_DEADLINE_TICKS RT_TICK_PER_SECOND/1000*P8_DEADLINE_MS
 #define P8_MB_POOL_SIZE 128
-
 
 void set_brake(uint8_t value); //between 0 and 255
 
@@ -31,6 +31,10 @@ void process8_entry()
     thresholds_t thresholds;
     uint8_t road_state = 0; //assume it is dry
     uint8_t brakes;
+#ifdef DEADLINE_TESTING
+    /*Initialize deadline*/
+    rt_tick_t next_deadline = deadline_init(P8_DEADLINE_TICKS);
+#endif
 
     thresholds.humidity_threshold = 70;
     thresholds.proximity_threshold[0] = 15;
@@ -42,6 +46,7 @@ void process8_entry()
 
         DEBUG_PRINT("Process 8 is waiting for mail\n", HEAVY_DEBUG);
 
+        /**TODO remove the waiting forever*/
         result = rt_mb_recv(&p8_mailbox, (rt_ubase_t *)&pointer, RT_WAITING_FOREVER);
 
         if (result != RT_EOK) {
@@ -86,14 +91,20 @@ void process8_entry()
             /*Check if the bus is in motion*/
             if (current_state.speed > 0 && current_state.rpm > 0) {
                 /*brake depending linearly on the proximity and modulated by speed*/
-                printf("%d %d\n", current_state.speed, current_state.rpm);
                 brakes = (255-current_state.proximity)*((float)current_state.speed/255);
                 set_brake(brakes);
             }
         }
 
         result = rt_mb_send(&p3_mailbox_bis, (rt_uint32_t)&current_state);
+#ifdef DEADLINE_TESTING
+        /*Online deadline testing*/
+        if (check_deadline(next_deadline) == DEADLINE_MISS) {
+            rt_kprintf("[!!WARNING!!] Process 8 missed the deadline!\n");
+        }
 
+        next_deadline = get_next_deadline(next_deadline, P8_DEADLINE_TICKS);
+#endif
     }
 
 
@@ -101,7 +112,7 @@ void process8_entry()
 
 void set_brake(uint8_t value) //between 0 and 255
 {
-    rt_kprintf("[BRAKING] : %d\n",value);
+    //rt_kprintf("[BRAKING] : %d\n",value);
     return;
 }
 

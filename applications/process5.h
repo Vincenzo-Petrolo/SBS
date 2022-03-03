@@ -6,12 +6,12 @@
 #include <rtthread.h>
 #include <time.h>
 
-#define P5_STACK 2048 //1kB
+#define P5_STACK 4096 //1kB
 #define P5_PRIORITY 3 //lower than p8 and p6
 #define P5_TSLICE 10 
-#define P5_DEADLINE 10 //ms
+#define P5_DEADLINE_MS 10 //ms
+#define P5_DEADLINE_TICKS RT_TICK_PER_SECOND/1000*P5_DEADLINE_MS
 #define P5_MB_POOL_SIZE 128
-
 
 
 int rpm_comp();
@@ -60,6 +60,10 @@ void process5_entry()
     int prox; //in m 0-20
     msg_t msg;
     rt_err_t result;
+#ifdef DEADLINE_TESTING
+    /*Initialize deadline*/
+    rt_tick_t next_deadline = deadline_init(P5_DEADLINE_TICKS);
+#endif
 
     DEBUG_PRINT("process5 started\n", HEAVY_DEBUG);
 
@@ -148,6 +152,14 @@ void process5_entry()
 
         /*Physical delay of polling*/
         //rt_thread_delay(100);
+#ifdef DEADLINE_TESTING
+        /*Online deadline testing*/
+        if (check_deadline(next_deadline) == DEADLINE_MISS) {
+            rt_kprintf("[!!WARNING!!] Process 5 missed the deadline!\n");
+        }
+
+        next_deadline = get_next_deadline(next_deadline, P5_DEADLINE_TICKS);
+#endif
 
     }
     return;
