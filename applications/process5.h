@@ -1,10 +1,13 @@
 #ifndef __PROCESS5__
 #define __PROCESS5__
+#define M 10
+#define N  100
 
 #include "sbs_configuration.h"
 #include "custom_types.h"
 #include <rtthread.h>
 #include <time.h>
+#include "image_edge.h"
 
 #define P5_STACK 4096 //1kB
 #define P5_PRIORITY 3 //lower than p8 and p6
@@ -13,6 +16,7 @@
 #define P5_DEADLINE_TICKS RT_TICK_PER_SECOND/1000*P5_DEADLINE_MS
 #define P5_MB_POOL_SIZE 128
 
+int image[M*N] = {0};
 
 int rpm_comp();
 int vel_comp();
@@ -64,6 +68,8 @@ void process5_entry()
     /*Initialize deadline*/
     rt_tick_t next_deadline = deadline_init(P5_DEADLINE_TICKS);
     rt_tick_t curr_deadline = 0;
+
+    rt_tick_t start_news, end_news;
 #endif
 
     DEBUG_PRINT("process5 started\n", HEAVY_DEBUG);
@@ -103,6 +109,11 @@ void process5_entry()
          * Since msg_t type is only 16bits we could send it as a copy.
          *TOOD compact in for loops
          */
+        start_news = rt_tick_get();
+        news(M, N, image);
+        end_news = rt_tick_get();
+        rt_kprintf("\n%u\n", end_news - start_news);
+
         if (rpm != -1) {
             msg.value = rpm;
             msg.sensor = 'R';
