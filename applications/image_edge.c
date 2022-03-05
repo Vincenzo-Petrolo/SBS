@@ -296,11 +296,6 @@ int *news ( int m, int n, int a[] )
 */
   thresh = e_max / 5;
 
-  fprintf ( stdout, "\n" );
-  fprintf ( stdout, "NEWS:\n" );
-  fprintf ( stdout, "  E_MAX = %d\n", e_max );
-  fprintf ( stdout, "  Using threshold value THRESH = %d\n", thresh );
-
   for ( j = 0; j < n; j++ )
   {
     for ( i = 0; i < m; i++ )

@@ -1,7 +1,7 @@
 #ifndef __PROCESS5__
 #define __PROCESS5__
-#define M 10
-#define N  100
+#define M 500
+#define N 600
 
 #include "sbs_configuration.h"
 #include "custom_types.h"
@@ -11,7 +11,7 @@
 
 #define P5_STACK 4096 //1kB
 #define P5_PRIORITY 3 //lower than p8 and p6
-#define P5_TSLICE 10 
+#define P5_TSLICE 10
 #define P5_DEADLINE_MS 10 //ms
 #define P5_DEADLINE_TICKS RT_TICK_PER_SECOND/1000*P5_DEADLINE_MS
 #define P5_MB_POOL_SIZE 128
@@ -110,9 +110,9 @@ void process5_entry()
          *TOOD compact in for loops
          */
         start_news = rt_tick_get();
-        news(M, N, image);
+        free(news(M, N, image));
         end_news = rt_tick_get();
-        rt_kprintf("\n%u\n", end_news - start_news);
+        rt_kprintf("\n\n TIME ELAPSED %u\n\n", end_news - start_news);
 
         if (rpm != -1) {
             msg.value = rpm;
