@@ -20,8 +20,6 @@
 #define RT_USING_TIMER_SOFT
 #define RT_TIMER_THREAD_PRIO 4
 #define RT_TIMER_THREAD_STACK_SIZE 1024
-#define RT_DEBUG
-#define RT_DEBUG_COLOR
 
 /* Inter-Thread communication */
 
@@ -62,7 +60,7 @@
 #define RT_USING_COMPONENTS_INIT
 #define RT_USING_USER_MAIN
 #define RT_MAIN_THREAD_STACK_SIZE 2048
-#define RT_MAIN_THREAD_PRIORITY 10
+#define RT_MAIN_THREAD_PRIORITY 0
 
 /* C++ features */
 
@@ -92,6 +90,7 @@
 #define DFS_FILESYSTEMS_MAX 2
 #define DFS_FILESYSTEM_TYPES_MAX 8
 #define DFS_FD_MAX 16
+#define RT_USING_DFS_MNTTABLE
 #define RT_USING_DFS_ELMFAT
 
 /* elm-chan's FatFs, Generic FAT Filesystem Module */
@@ -134,6 +133,7 @@
 #define RT_MMCSD_STACK_SIZE 1024
 #define RT_MMCSD_THREAD_PREORITY 22
 #define RT_MMCSD_MAX_PARTITION 16
+#define RT_SDIO_DEBUG
 #define RT_USING_SPI
 #define RT_USING_SPI_MSD
 #define RT_USING_SFUD
@@ -239,7 +239,6 @@
 /* Utilities */
 
 /* end of Utilities */
-#define RT_USING_LWP
 /* end of RT-Thread Components */
 
 /* RT-Thread online packages */
@@ -265,6 +264,14 @@
 
 /* security packages */
 
+#define PKG_USING_TINYCRYPT
+#define PKG_USING_TINYCRYPT_LATEST_VERSION
+#define TINY_CRYPT_MD5
+#define TINY_CRYPT_BASE64
+#define TINY_CRYPT_AES
+#define TINY_CRYPT_AES_ROM_TABLES
+#define TINY_CRYPT_SHA1
+#define TINY_CRYPT_SHA256
 /* end of security packages */
 
 /* language packages */
