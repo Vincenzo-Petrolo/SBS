@@ -5,9 +5,9 @@
 #include "custom_types.h"
 #include <rtthread.h>
 
-#define P7_STACK 4096 //1kB
+#define P7_STACK 4096 //4kB
 #define P7_PRIORITY 3 //highest priority
-#define P7_TSLICE 10 //TODO verify if this is ok
+#define P7_TSLICE 10
 #define P7_DEADLINE_MS 15 //ms
 #define P7_DEADLINE_TICKS RT_TICK_PER_SECOND/1000*P7_DEADLINE_MS
 #define P7_MB_POOL_SIZE 128
@@ -19,7 +19,7 @@ void process7_entry()
 {
 
     rt_err_t result;
-    uint32_t *pointer; //declare a pointer to data received
+    uint32_t *pointer;
     msg_t *msg;
     msg_t rec;
 #ifdef DEADLINE_TESTING
@@ -92,8 +92,6 @@ static msg_t can_receive_msg(void)
     } else {
         sensor_name = 'T';
     }
-
-    //rt_thread_delay(500);
 
     DEBUG_PRINT("Received from CAN network\n", HEAVY_DEBUG);
 

@@ -7,7 +7,7 @@
 #include <tiny_aes.h>
 
 
-#define P1_STACK 4096 //1kB
+#define P1_STACK 4096 //4kB
 #define P1_PRIORITY 3 //lower than hard real time tasks
 #define P1_TSLICE 10
 #define P1_DEADLINE_MS 25
@@ -33,7 +33,7 @@ void process1_entry()
         receive_data(encrypted_value);
 
         /*Send data to p3 waiting for it to empty if it is full*/
-        result = rt_mb_send_wait(&p3_mailbox, (rt_uint32_t)encrypted_value, 100);
+        result = rt_mb_send_wait(&p3_mailbox, (rt_uint32_t)encrypted_value, 25);
         /*If timeout is reached or error encountered then receive new data, because this is a firm realtime task*/
         if (result == -RT_ETIMEOUT) {
             DEBUG_PRINT("P1 reached timeout waiting for p3 to empty", LIGHT_DEBUG);
@@ -84,8 +84,6 @@ void receive_data(unsigned char *encrypted_value)
     rt_memset(encrypted_value, 0x0, sizeof(encrypted_value));
     tiny_aes_setkey_enc(&ctx, (uint8_t *) private_key, 256);
     tiny_aes_crypt_cbc(&ctx, AES_ENCRYPT, sizeof(external_state_t), iv, data_to_encrypt,encrypted_value);
-
-    //rt_thread_delay(1000);
 
     return;
 }

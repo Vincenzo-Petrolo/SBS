@@ -22,14 +22,15 @@ static int fd = -1; //at beginning no file is open
 
 static void hook_of_scheduler(struct rt_thread* from, struct rt_thread* to)
 {
-    FILE *fp = fopen("timings.csv", "a");
+    FILE *fp = open("timings.csv", O_WRONLY | O_APPEND | O_CREAT);
 #if DEBUG_LEVEL == HEAVY_DEBUG
     rt_kprintf("%s -> %s\n", from->name, to->name);
 #endif
 
-    if (fp != NULL) {
-        fprintf(fp, "%s\n", to->name);
-        fclose(fp);
+    if (fd >= 0) {
+        write(fd, to->name, rt_strlen(to->name));
+        write(fd, "\n", 1);
+        close(fd);
     } else {
         rt_kprintf("Can't open the file\n");
     }

@@ -1,7 +1,7 @@
 #ifndef __PROCESS5__
 #define __PROCESS5__
 #define M 500
-#define N 600
+#define N 400
 
 #include "sbs_configuration.h"
 #include "custom_types.h"
@@ -9,7 +9,7 @@
 #include <time.h>
 #include "image_edge.h"
 
-#define P5_STACK 4096 //1kB
+#define P5_STACK 4096 //4kB
 #define P5_PRIORITY 3 //lower than p8 and p6
 #define P5_TSLICE 10
 #define P5_DEADLINE_MS 10 //ms
@@ -103,12 +103,6 @@ void process5_entry()
         rt_timer_start(timerprox);
 
     while (1) {
-        /*TODO since we are giving other threads the same pointer
-         * to the msg variable, then it might happen that the content
-         * of a msg is written during the read from the other thread.
-         * Since msg_t type is only 16bits we could send it as a copy.
-         *TOOD compact in for loops
-         */
         start_news = rt_tick_get();
         free(news(M, N, image));
         end_news = rt_tick_get();
@@ -162,8 +156,6 @@ void process5_entry()
             continue;
         }
 
-        /*Physical delay of polling*/
-        //rt_thread_delay(100);
 #ifdef DEADLINE_TESTING
         /*Online deadline testing*/
         if (check_deadline(next_deadline) == DEADLINE_MISS) {

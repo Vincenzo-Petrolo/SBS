@@ -7,7 +7,7 @@
 #include <time.h>
 
 #define P4_STACK 4096 //4kB
-#define P4_PRIORITY 6
+#define P4_PRIORITY 6 //lowest priority
 #define P4_TSLICE 1
 #define P4_DEADLINE_MS 200 //ms
 #define P4_DEADLINE_TICKS RT_TICK_PER_SECOND/1000*P4_DEADLINE_MS
@@ -16,12 +16,11 @@
 static void send_json(uint8_t rpm, uint8_t speed, uint8_t proximity, uint8_t humidity);
 
 /*To be used only by this process*/
-/*Use the other uart peripheral of the board, to send data*/
+/*Uses the other uart peripheral of the board, to send data*/
 #define DEVICE_NAME "uart1"
 static rt_device_t serial_monitor;
 
-/*This process is in charge of creating JSON packages sent through UART
- * connection to the monitor.*/
+/*This process is in charge of creating JSON packages sent through UART connection to the monitor*/
 void process4_entry(void *param)
 {
     uint32_t *pointer;
@@ -49,17 +48,15 @@ void process4_entry(void *param)
 
         DEBUG_PRINT("Process 4 is waiting for mail\n", HEAVY_DEBUG);
 
-        result = rt_mb_recv(&p4_mailbox, (rt_ubase_t *)&pointer, RT_WAITING_FOREVER);
+        result = rt_mb_recv(&p4_mailbox, (rt_ubase_t *)&pointer, 200);
 
         if (result != RT_EOK) {
             DEBUG_PRINT("Process 4 wasn't able to receive mail\n",LIGHT_DEBUG);
             /*Continue with next cycle*/
-
             continue;
         }
 
-        /*Care must be taken on mailbox messages because they are
-         * shared pointer and data can change.*/
+        /*Care must be taken on mailbox messages because they are shared pointers and data can change.*/
         msg = (msg_t *) pointer;
 
         switch (msg->sensor) {

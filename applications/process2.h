@@ -7,7 +7,7 @@
 #include <tiny_aes.h>
 
 
-#define P2_STACK 4096 //1kB
+#define P2_STACK 4096 //4kB
 #define P2_PRIORITY 6 //lower than firm and hard
 #define P2_TSLICE 10
 #define P2_DEADLINE_MS 25
@@ -39,8 +39,6 @@ void process2_entry()
         }
         /*Send data over the network*/
         transmit_data((unsigned char *) pointer);
-        //write_finish_time("process2_finish_times");
-
     }
 #ifdef DEADLINE_TESTING
         /*Online deadline testing*/
@@ -57,8 +55,6 @@ void process2_entry()
 
 void transmit_data(unsigned char *encrypted_value)
 {
-    //rt_thread_delay(100);
-
     return;
 }
 #endif
