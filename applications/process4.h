@@ -31,6 +31,7 @@ void process4_entry(void *param)
 #ifdef DEADLINE_TESTING
     /*Initialize deadline*/
     rt_tick_t next_deadline = deadline_init(P4_DEADLINE_TICKS);
+    rt_tick_t curr_deadline = 0;
 #endif
     DEBUG_PRINT("process4 started\n", HEAVY_DEBUG);
     serial_monitor = rt_device_find(DEVICE_NAME);
@@ -86,7 +87,10 @@ void process4_entry(void *param)
             rt_kprintf("[!!WARNING!!] Process 4 missed the deadline!\n");
         }
 
-        next_deadline = get_next_deadline(next_deadline, P4_DEADLINE_TICKS);
+        if (rt_tick_get() > curr_deadline) {
+            curr_deadline = next_deadline;
+            next_deadline = get_next_deadline(next_deadline, P4_DEADLINE_TICKS);
+        }
 #endif
     }
     return;

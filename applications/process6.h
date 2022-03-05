@@ -24,6 +24,7 @@ void process6_entry()
 #ifdef DEADLINE_TESTING
     /*Initialize deadline*/
     rt_tick_t next_deadline = deadline_init(P6_DEADLINE_TICKS);
+    rt_tick_t curr_deadline = 0;
 #endif
 
     DEBUG_PRINT("process6 started\n", HEAVY_DEBUG);
@@ -70,7 +71,11 @@ void process6_entry()
             rt_kprintf("[!!WARNING!!] Process 6 missed the deadline!\n");
         }
 
-        next_deadline = get_next_deadline(next_deadline, P6_DEADLINE_TICKS);
+        if (rt_tick_get() > curr_deadline) {
+            curr_deadline = next_deadline;
+            next_deadline = get_next_deadline(next_deadline, P6_DEADLINE_TICKS);
+        }
+
 #endif
         }
 }

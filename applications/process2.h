@@ -23,6 +23,7 @@ void process2_entry()
 #ifdef DEADLINE_TESTING
     /*Initialize deadline*/
     rt_tick_t next_deadline = deadline_init(P2_DEADLINE_TICKS);
+    rt_tick_t curr_deadline = 0;
 #endif
 
     while (1) {
@@ -47,7 +48,10 @@ void process2_entry()
             rt_kprintf("[!!WARNING!!] Process 2 missed the deadline!\n");
         }
 
-        next_deadline = get_next_deadline(next_deadline, P2_DEADLINE_TICKS);
+        if (rt_tick_get() > curr_deadline) {
+            curr_deadline = next_deadline;
+            next_deadline = get_next_deadline(next_deadline, P2_DEADLINE_TICKS);
+        }
 #endif
 }
 

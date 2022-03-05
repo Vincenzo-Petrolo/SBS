@@ -52,7 +52,7 @@ int main() {
     /*If using deadline testing, comment out this otherwise it will
      * use all the bandwidth during the preemption moments and cause
      * all other tasks to miss their deadlines.*/
-    rt_scheduler_sethook(hook_of_scheduler);
+    //rt_scheduler_sethook(hook_of_scheduler);
 
 
     rt_sem_init(&sem_lock, "lock", 1, RT_IPC_FLAG_FIFO);
