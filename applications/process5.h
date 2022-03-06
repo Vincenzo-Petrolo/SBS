@@ -146,7 +146,6 @@ void process5_entry()
             continue;
         }
 
-        /*Physical delay of polling*/
 
     }
     return;

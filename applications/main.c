@@ -222,7 +222,7 @@ int main() {
         return 1;
     }
 
-
+#if 0
     rt_err_t p6_startup_error = rt_thread_startup(process6_thread);
 
     if (p6_startup_error == RT_ERROR) {
@@ -230,7 +230,7 @@ int main() {
 
         return 1;
     }
-
+#endif
 
     rt_err_t p8_startup_error = rt_thread_startup(process8_thread);
 
