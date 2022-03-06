@@ -38,15 +38,16 @@ void process8_entry()
     thresholds.proximity_threshold[1] = 30;
 
     DEBUG_PRINT("process8 started\n", HEAVY_DEBUG);
-    int fd = open("pippo.txt", O_TRUNC);
+    int fd = open("pippo.txt", O_CREAT | O_WRONLY);
+    int written_bytes;
 
      if (fd > 0) {
          while (1) {
-             write(fd, "1", 1);
+             written_bytes = write(fd, "1", 1);
+             rt_kprintf("Written %d bytes\n", written_bytes);
          }
      }
     while (1) {
-
 
         DEBUG_PRINT("Process 8 is waiting for mail\n", HEAVY_DEBUG);
 
