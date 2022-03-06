@@ -4,10 +4,11 @@
 #include "sbs_configuration.h"
 #include "custom_types.h"
 #include <rtthread.h>
+#include <dfs_posix.h>
 
 #define P8_STACK 4096 //1kB
 #define P8_PRIORITY 2 //lower than p6
-#define P8_TSLICE 100 //TODO verify if this is ok
+#define P8_TSLICE 1 //TODO verify if this is ok
 #define P8_DEADLINE 10 //ms
 #define P8_MB_POOL_SIZE 128
 
@@ -37,8 +38,15 @@ void process8_entry()
     thresholds.proximity_threshold[1] = 30;
 
     DEBUG_PRINT("process8 started\n", HEAVY_DEBUG);
+    int fd = open("pippo.txt", O_TRUNC);
 
+     if (fd > 0) {
+         while (1) {
+             write(fd, "1", 1);
+         }
+     }
     while (1) {
+
 
         DEBUG_PRINT("Process 8 is waiting for mail\n", HEAVY_DEBUG);
 

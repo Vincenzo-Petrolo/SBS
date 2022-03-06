@@ -7,7 +7,7 @@
 #include <time.h>
 
 #define P5_STACK 4096 //1kB
-#define P5_PRIORITY 3 //lower than p8 and p6
+#define P5_PRIORITY 2 //lower than p8 and p6
 #define P5_TSLICE 10 
 #define P5_DEADLINE 10 //ms
 #define P5_MB_POOL_SIZE 128
@@ -147,7 +147,6 @@ void process5_entry()
         }
 
         /*Physical delay of polling*/
-        rt_thread_delay(100);
 
     }
     return;
