@@ -29,6 +29,15 @@
 extern "C" {
 #endif
 
+
+/**
+ * OSES Kernel fix group
+ */
+#ifdef OSES_KERNEL_FIX
+/* Global variable telling if scheduler hook was called */
+extern uint8_t scheduler_hook_parent_call;
+
+#endif
 /**
  * @addtogroup KernelObject
  */

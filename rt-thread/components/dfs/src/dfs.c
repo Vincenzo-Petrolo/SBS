@@ -101,7 +101,6 @@ void dfs_lock(void)
     {
         result = rt_mutex_take(&fslock, RT_WAITING_FOREVER);
     }
-
     if (result != RT_EOK)
     {
         RT_ASSERT(0);

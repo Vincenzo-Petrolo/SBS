@@ -39,6 +39,8 @@
 #include <rtthread.h>
 #include <rthw.h>
 
+
+
 #ifdef RT_USING_HOOK
 extern void (*rt_object_trytake_hook)(struct rt_object *object);
 extern void (*rt_object_take_hook)(struct rt_object *object);
@@ -748,10 +750,21 @@ __again:
 
                 /* enable interrupt */
                 rt_hw_interrupt_enable(temp);
-
+#ifdef OSES_KERNEL_FIX
+                /* do schedule only if i'm here not due to the hook scheduler
+                 * otherwise the scheduler can reach this point. */
+                if (scheduler_hook_parent_call != 1) {
+                    /*If not coming from a hook scheduler
+                     * parent call, then schedule*/
+                    rt_kprintf("Scheduling on lock unavailable\n");
+                    rt_schedule();
+                } else {
+                    rt_kprintf("Sorry I can't schedule, you coming from hook of scheduler\n");
+                }
+#else
                 /* do schedule */
                 rt_schedule();
-
+#endif
                 if (thread->error != RT_EOK)
                 {
                     /* interrupt by signal, try it again */

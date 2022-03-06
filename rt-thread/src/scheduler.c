@@ -33,6 +33,10 @@
 #include <rtthread.h>
 #include <rthw.h>
 
+#ifdef OSES_KERNEL_FIX
+uint8_t scheduler_hook_parent_call = 0;
+#endif
+
 #ifdef RT_USING_SMP
 rt_hw_spinlock_t _rt_critical_lock;
 #endif /*RT_USING_SMP*/
@@ -359,9 +363,17 @@ void rt_schedule(void)
             {
                 /* if the destination thread is not the same as current thread */
                 pcpu->current_priority = (rt_uint8_t)highest_ready_priority;
-
+#ifdef OSES_KERNEL_FIX
+                /*Use this flag to tell the system that the hook for the scheduler is
+                 * under execution.*/
+                scheduler_hook_parent_call = 1;
+                /*Execute the hook*/
                 RT_OBJECT_HOOK_CALL(rt_scheduler_hook, (current_thread, to_thread));
-
+                /*After the hook is executed, reset the flag*/
+                scheduler_hook_parent_call = 0;
+#else
+                RT_OBJECT_HOOK_CALL(rt_scheduler_hook, (current_thread, to_thread));
+#endif
                 rt_schedule_remove_thread(to_thread);
                 to_thread->stat = RT_THREAD_RUNNING | (to_thread->stat & ~RT_THREAD_STAT_MASK);
 
@@ -459,8 +471,17 @@ void rt_schedule(void)
                 rt_current_priority = (rt_uint8_t)highest_ready_priority;
                 from_thread         = rt_current_thread;
                 rt_current_thread   = to_thread;
-
-                RT_OBJECT_HOOK_CALL(rt_scheduler_hook, (from_thread, to_thread));
+#ifdef OSES_KERNEL_FIX
+                /*Use this flag to tell the system that the hook for the scheduler is
+                 * under execution.*/
+                scheduler_hook_parent_call = 1;
+                /*Execute the hook*/
+                RT_OBJECT_HOOK_CALL(rt_scheduler_hook, (current_thread, to_thread));
+                /*After the hook is executed, reset the flag*/
+                scheduler_hook_parent_call = 0;
+#else
+                RT_OBJECT_HOOK_CALL(rt_scheduler_hook, (current_thread, to_thread));
+#endif
 
                 if (need_insert_from_thread)
                 {
@@ -609,8 +630,17 @@ void rt_scheduler_do_irq_switch(void *context)
                 /* if the destination thread is not the same as current thread */
 
                 pcpu->current_priority = (rt_uint8_t)highest_ready_priority;
-
+#ifdef OSES_KERNEL_FIX
+                /*Use this flag to tell the system that the hook for the scheduler is
+                 * under execution.*/
+                scheduler_hook_parent_call = 1;
+                /*Execute the hook*/
                 RT_OBJECT_HOOK_CALL(rt_scheduler_hook, (current_thread, to_thread));
+                /*After the hook is executed, reset the flag*/
+                scheduler_hook_parent_call = 0;
+#else
+                RT_OBJECT_HOOK_CALL(rt_scheduler_hook, (current_thread, to_thread));
+#endif
 
                 rt_schedule_remove_thread(to_thread);
                 to_thread->stat = RT_THREAD_RUNNING | (to_thread->stat & ~RT_THREAD_STAT_MASK);
