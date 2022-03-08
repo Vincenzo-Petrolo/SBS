@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from email import header
 import colorama
 from colorama import Fore
 from simple_term_menu import TerminalMenu
@@ -139,9 +140,28 @@ def scenario_menu():
         people_onboard_value = 10
     print(Fore.GREEN +"People present on bus set to:" + str(people_onboard_value))
 
+def generate_headerfile():
+    headerfile = open("sensors_header.h", "w")
+    headerfile.write("#ifndef __SENSORS_CONFIG_H__\n")
+    headerfile.write("#define __SENSORS_CONFIG_H__\n")
+
+    #write proximity starting value
+    headerfile.write("unsigned int proximity_start = " + str(proximity_value) + ";\n")
+    headerfile.write("unsigned int humidity_value = " + str(humidity_value) + ";\n")
+    headerfile.write("unsigned int initial_speed = " + str(speed_value) + ";\n")
+    headerfile.write("unsigned int rpm_value = " + str(rpm_value) + ";\n")
+    headerfile.write("unsigned int brake_pads_wearing_value = " + str(brake_pads_wearing_value) + ";\n")
+    headerfile.write("unsigned int tyre_pressure_value = " + str(tyre_pressure_value) + ";\n")
+    headerfile.write("unsigned int people_onboard = " + str(people_onboard_value) + ";\n")
+
+    headerfile.write("#endif")
+    headerfile.close()
+    pass
+
 def main():
-    print(initial_print)
+    print(Fore.YELLOW + initial_print)
     scenario_menu()
+    generate_headerfile()
 
 if __name__ == "__main__":
     main()
