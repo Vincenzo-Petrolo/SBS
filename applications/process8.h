@@ -81,7 +81,7 @@ void process8_entry()
         DEBUG_PRINT("Process 8 is waiting for mail\n", HEAVY_DEBUG);
 
         /**Wait for 3ms at most and then make a decision*/
-        result = rt_mb_recv(&p8_mailbox, (rt_ubase_t *)&pointer, ms2ticks(3));
+        result = rt_mb_recv(&p8_mailbox, (rt_ubase_t *)&pointer, RT_WAITING_FOREVER);
 
         if (result != RT_EOK) {
             DEBUG_PRINT("Process8 wasn't able to receive mail\n",LIGHT_DEBUG);

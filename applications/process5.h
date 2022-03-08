@@ -1,13 +1,16 @@
 #ifndef __PROCESS5__
 #define __PROCESS5__
-#define M 500
-#define N 400
+
 
 #include "sbs_configuration.h"
 #include "custom_types.h"
 #include <rtthread.h>
 #include <time.h>
 #include "image_edge.h"
+
+#define M 500
+#define N 400
+
 
 #define P5_STACK 4096 //4kB
 #define P5_PRIORITY 3 //lower than p8 and p6
@@ -16,7 +19,11 @@
 #define P5_DEADLINE_TICKS RT_TICK_PER_SECOND/1000*P5_DEADLINE_MS
 #define P5_MB_POOL_SIZE 128
 
+#ifdef OVERLOAD_TESTING
+
 int image[M*N] = {0};
+
+#endif
 
 int rpm_comp();
 int vel_comp();
@@ -69,6 +76,8 @@ void process5_entry()
     rt_tick_t next_deadline = deadline_init(P5_DEADLINE_TICKS);
     rt_tick_t curr_deadline = 0;
 
+#endif
+#ifdef OVERLOAD_TESTING
     rt_tick_t start_news, end_news;
 #endif
 
@@ -103,11 +112,13 @@ void process5_entry()
         rt_timer_start(timerprox);
 
     while (1) {
+
+#ifdef OVERLOAD_TESTING
         start_news = rt_tick_get();
         free(news(M, N, image));
         end_news = rt_tick_get();
-        rt_kprintf("\n\n TIME ELAPSED %u\n\n", end_news - start_news);
-
+        //rt_kprintf("\n\n TIME ELAPSED %u\n\n", end_news - start_news);
+#endif
         if (rpm != -1) {
             msg.value = rpm;
             msg.sensor = 'R';
@@ -155,6 +166,8 @@ void process5_entry()
             /*Continue with next cycle*/
             continue;
         }
+
+        rt_thread_delay(1000);
 
 #ifdef DEADLINE_TESTING
         /*Online deadline testing*/

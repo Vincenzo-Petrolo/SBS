@@ -14,6 +14,10 @@
 #include "process2.h"
 #include "process7.h"
 
+#ifdef BENCHMARKING
+#include "cpu_usage.h"
+#endif
+
 /*Visible to this file only*/
 static uint8_t p8_mb_pool[P8_MB_POOL_SIZE], p6_mb_pool[P6_MB_POOL_SIZE],p4_mb_pool[P4_MB_POOL_SIZE], p3_mb_pool[2*sizeof(external_state_t)],
 p2_mb_pool[P2_MB_POOL_SIZE],p3_mb_pool_bis[P3_MB_POOL_SIZE], p7_mb_pool[P7_MB_POOL_SIZE];
@@ -48,6 +52,7 @@ int main() {
     rt_err_t result;
     srand(time(NULL));
 
+#ifndef DEADLINE_TESTING
 
     fd = open("timings.csv",  O_TRUNC);
     close(fd);
@@ -58,8 +63,25 @@ int main() {
     /*If using deadline testing, comment out this otherwise it will
      * use all the bandwidth during the preemption moments and cause
      * all other tasks to miss their deadlines.*/
-    //rt_scheduler_sethook(hook_of_scheduler_light);
+#if DEBUG_LEVEL != NO_DEBUG
+    rt_scheduler_sethook(hook_of_scheduler_light);
+#endif
 
+#endif
+
+#ifdef BENCHMARKING
+    /*Initialize the module*/
+    cpu_usage_init();
+    /*Let the system run for a given amount of ms, then get benchmarks*/
+    rt_timer_t cpu_load_timer = rt_timer_create("benchamrk_timer",
+                                                &print_cpu_load_results,
+                                                NULL,
+                                                ms2ticks(1000* 10),
+                                                RT_TIMER_FLAG_ONE_SHOT);
+    /*Start the timer*/
+    if (cpu_load_timer != NULL)
+        rt_timer_start(cpu_load_timer);
+#endif
 
     rt_sem_init(&sem_lock, "lock", 1, RT_IPC_FLAG_FIFO);
 

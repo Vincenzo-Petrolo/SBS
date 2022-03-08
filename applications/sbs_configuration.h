@@ -2,7 +2,7 @@
 #define __SBS_CONFIGURATION__
 
 #include <stdio.h>
-
+#include "cpu_usage.h"
 /*Debug levels to be used as the lvl parameter for the macro DEBUG_PRINT*/
 #define HEAVY_DEBUG 3
 #define MODERATE_DEBUG 2
@@ -11,6 +11,15 @@
 
 /*Define the global debug level*/
 #define DEBUG_LEVEL NO_DEBUG
+
+
+/*****************CONFIGURATION******************/
+//#define DEADLINE_TESTING
+//#define OVERLOAD_TESTING
+
+#define BENCHMARKING
+/*****************END CONFIGURATION**************/
+
 
 #define DEBUG_PRINT(string, lvl) \
     if (lvl <= DEBUG_LEVEL) {\
@@ -35,7 +44,7 @@ const struct dfs_mount_tbl mount_table[] =
     {0}
 };
 
-#define DEADLINE_TESTING
+
 
 #ifdef DEADLINE_TESTING
 
@@ -69,9 +78,38 @@ rt_tick_t get_next_deadline(rt_tick_t curr_deadline, rt_tick_t process_deadline)
     return curr_deadline + process_deadline;
 }
 
+
+
+#endif
+
 rt_tick_t ms2ticks(int milliseconds)
 {
     return RT_TICK_PER_SECOND/1000*milliseconds;
+}
+
+int ticks2ms(uint64_t ticks)
+{
+   return ticks * 1000 / RT_TICK_PER_SECOND;
+}
+
+#ifdef BENCHMARKING
+
+void print_cpu_load_results(void)
+{
+
+    float cpu_average_load = cpu_load_average();
+    cpu_usage_t *infos = cpu_usage_obj();
+
+    printf("\n================================================");
+    printf(
+            "Total idle time: %d\n"\
+            "Average CPU load: %.2f%%\n",
+                                        ticks2ms(infos->idle_stat[0].idle_tick),
+                                        cpu_average_load
+                                        );
+    printf("\n================================================");
+
+    return;
 }
 
 #endif

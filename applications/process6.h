@@ -35,7 +35,7 @@ void process6_entry()
 
             /*Limit the wait time to 5ms at most, then if no data has arrived
              * make a decision*/
-            result = rt_mb_recv(&p6_mailbox, (rt_ubase_t *)&pointer, ms2ticks(1));
+            result = rt_mb_recv(&p6_mailbox, (rt_ubase_t *)&pointer, RT_WAITING_FOREVER);
 
             if (result != RT_EOK) {
                 DEBUG_PRINT("Process6 wasn't able to receive mail\n",LIGHT_DEBUG);

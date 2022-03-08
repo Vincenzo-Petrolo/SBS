@@ -241,9 +241,7 @@ int *news ( int m, int n, int a[] )
   This will be our M+2 by N+2 data array B.
 */
 
-  rt_kprintf("s : %u \t", rt_tick_get());
   b = ( int * ) malloc ( ( m + 2 ) * ( n + 2 ) * sizeof ( int ) );
-  rt_kprintf("f : %u\n", rt_tick_get());
 
   for ( j = 0; j < n; j++ )
   {
