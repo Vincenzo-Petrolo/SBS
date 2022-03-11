@@ -21,6 +21,7 @@ void process6_entry()
     uint8_t current_rpm = 0;
     uint8_t current_speed = 0;
     uint8_t ABS_state = 0;
+
 #ifdef DEADLINE_TESTING
     /*Initialize deadline*/
     rt_tick_t next_deadline = deadline_init(P6_DEADLINE_TICKS);
@@ -33,8 +34,6 @@ void process6_entry()
 
             DEBUG_PRINT("Process 6 is waiting for mail\n", HEAVY_DEBUG);
 
-            /*Limit the wait time to 5ms at most, then if no data has arrived
-             * make a decision*/
             result = rt_mb_recv(&p6_mailbox, (rt_ubase_t *)&pointer, RT_WAITING_FOREVER);
 
             if (result != RT_EOK) {

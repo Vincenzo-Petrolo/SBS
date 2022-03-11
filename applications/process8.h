@@ -85,7 +85,7 @@ void process8_entry()
         if (result != RT_EOK) {
             DEBUG_PRINT("Process8 wasn't able to receive mail\n",LIGHT_DEBUG);
             DEBUG_PRINT("Braking for safety reasons\n",LIGHT_DEBUG);
-            set_brake(10.0);
+            set_brake(brakes);
 
             /*Continue with next cycle*/
             continue;
@@ -111,7 +111,6 @@ void process8_entry()
                 break;
         }
 
-        //TODO this can be avoided if we haven't updated the humidity value this cycle
         if (current_state.humidity > thresholds[0].humidity_threshold) {
             /*road is dry*/
             road_state = 0;
