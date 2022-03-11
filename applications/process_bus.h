@@ -3,12 +3,6 @@
 
 #include "sbs_configuration.h"
 #include "custom_types.h"
-
-#ifdef SIMBUS
-#include "simbus.h"
-bus_t simbus;
-#endif
-
 #include <rtthread.h>
 
 #define P8_STACK 4096 //1kB
@@ -17,6 +11,8 @@ bus_t simbus;
 #define P8_DEADLINE_MS 10 //ms
 #define P8_DEADLINE_TICKS RT_TICK_PER_SECOND/1000*P8_DEADLINE_MS
 #define P8_MB_POOL_SIZE 128
+
+void set_brake(float value); //between 0 and 10 m/s^2
 
 typedef struct {
     uint8_t humidity_threshold;
@@ -37,13 +33,6 @@ void process8_entry()
     uint8_t road_state = 0; //assume it is dry
     float brakes;
     uint8_t i;
-#ifdef SIMBUS
-    rt_tick_t last_tick,curr_tick;
-    /*Initialize bus*/
-    bus_init(&simbus);
-    last_tick = rt_tick_get();
-#endif
-
 #ifdef DEADLINE_TESTING
     /*Initialize deadline*/
     rt_tick_t next_deadline = deadline_init(P8_DEADLINE_TICKS);
@@ -96,9 +85,8 @@ void process8_entry()
         if (result != RT_EOK) {
             DEBUG_PRINT("Process8 wasn't able to receive mail\n",LIGHT_DEBUG);
             DEBUG_PRINT("Braking for safety reasons\n",LIGHT_DEBUG);
-#ifdef SIMBUS
-            set_brake(&simbus, brakes);
-#endif
+            set_brake(brakes);
+
             /*Continue with next cycle*/
             continue;
         }
@@ -157,10 +145,8 @@ void process8_entry()
 
                 /*brake depending linearly on the proximity and modulated by speed*/
                 brakes = 10.0*((float)(thresholds[i].proximity_threshold[road_state] - current_state.proximity))/((float)(thresholds[i].proximity_threshold[road_state] - thresholds[i].critical_proximity_threshold));
-#ifdef SIMBUS
-                set_brake(&simbus, brakes);
-#endif
-            }
+                set_brake(brakes);
+                }
 
         }
 
@@ -178,26 +164,16 @@ void process8_entry()
 
 
 #endif
-
-#ifdef SIMBUS
-        curr_tick = rt_tick_get();
-        /*Step the simulation*/
-        step_sim(&simbus, (float)ticks2ms((curr_tick-last_tick))/1000);
-        last_tick = curr_tick;
-
-        /*Check bus conditions*/
-        if (bus_crashed(&simbus) == SIMBUS_CRASHED) {
-            rt_kprintf("[EMERGENCY] The bus crashed!!!\n");
-        }
-        if (bus_is_still(&simbus) == SIMBUS_STILL) {
-            rt_kprintf("The bus is still\n");
-        }
-        printf("Bus speed: %f m/s and proximity is %u m\n", get_speed(&simbus), get_proximity(&simbus));
-
-#endif
     }
 
 
+}
+
+void set_brake(float value) //between 0 and 10 m/s^2
+{
+
+    printf("[BRAKING] : %f\n", value);
+    return;
 }
 
 #endif

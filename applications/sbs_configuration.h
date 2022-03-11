@@ -16,7 +16,7 @@
 /*****************CONFIGURATION******************/
 //#define DEADLINE_TESTING
 //#define OVERLOAD_TESTING
-
+#define SIMBUS
 #define BENCHMARKING
 /*****************END CONFIGURATION**************/
 

@@ -8,6 +8,11 @@
 #include <time.h>
 #include "image_edge.h"
 
+#ifdef SIMBUS
+/*For including the global simbus*/
+#include "process8.h"
+#endif
+
 #define M 500
 #define N 400
 
@@ -45,7 +50,10 @@ static void timeoutvel(void *vel)
 {
     int *p;
     p = (int *) vel;
-    *p = vel_comp();
+#ifdef SIMBUS
+    /*Get bus speed*/
+    *p = get_speed(&simbus);
+#endif
 }
 
 static void timeouthum(void *hum)
