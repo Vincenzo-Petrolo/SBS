@@ -18,8 +18,8 @@
 
 
 #define P5_STACK 4096 //4kB
-#define P5_PRIORITY 3 //lower than p8 and p6
-#define P5_TSLICE 10
+#define P5_PRIORITY 2 //lower than p8 and p6
+#define P5_TSLICE 50
 #define P5_DEADLINE_MS 10 //ms
 #define P5_DEADLINE_TICKS RT_TICK_PER_SECOND/1000*P5_DEADLINE_MS
 #define P5_MB_POOL_SIZE 128
@@ -44,7 +44,7 @@ static void timeoutrpm(void *rpm)
 {
     int *p;
     p = (int *) rpm;
-    *p = rpm_comp();
+    *p = get_rpm(&simbus);
 }
 static void timeoutvel(void *vel)
 {
@@ -60,14 +60,14 @@ static void timeouthum(void *hum)
 {
     int *p;
     p = (int *) hum;
-    *p = hum_comp();
+    *p = get_humidity(&simbus);
 }
 
 static void timeoutprox(void *prox)
 {
-    int *p;
-    p = (int *) prox;
-    *p = prox_comp();
+    unsigned int *p;
+    p = (unsigned int *) prox;
+    *p = get_proximity(&simbus);
 }
 
 void process5_entry()
@@ -76,7 +76,11 @@ void process5_entry()
     int rpm; //in rpm 0-400
     int vel; //in kmh 0-80
     int hum; //in % 0-100
-    int prox; //in m 0-20
+    unsigned int prox; //in m 0-20
+    timeouthum(&hum);
+    timeoutprox(&prox);
+    timeoutrpm(&rpm);
+    timeoutvel(&vel);
     msg_t msg;
     rt_err_t result;
 #ifdef DEADLINE_TESTING
@@ -104,7 +108,7 @@ void process5_entry()
                                  RT_TIMER_FLAG_PERIODIC);
 
     timerprox = rt_timer_create("timerprox", timeoutprox,
-                                (void *)&prox, 10,
+                                (void *)&prox, 50,
                                  RT_TIMER_FLAG_PERIODIC);
 
     if (timerrpm != RT_NULL)

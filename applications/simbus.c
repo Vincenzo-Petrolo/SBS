@@ -2,6 +2,7 @@
 #include "sensors_header.h"
 #include <math.h>
 
+
 void bus_init(bus_t *obj)
 {
     obj->proximity = proximity_start;
@@ -102,8 +103,8 @@ uint8_t get_people_onboard(bus_t *obj)
 
 void set_brake(bus_t *obj, float b)
 {
-    if (obj->brakes > 100)
-        obj->brakes = 100;
+    if (obj->brakes > 10)
+        obj->brakes = 10;
     else obj->brakes = b;
 
     return;
@@ -118,9 +119,12 @@ void step_sim(bus_t *obj, float s)
 {
     /*First reduce proximity value by computing distance traveled in s time.*/
     if (obj->speed > 0)
-        obj->proximity -= obj->speed*s - (obj->brakes*obj->brake_pads_wearing/100)/2 * pow(s,2);
+        obj->proximity -= obj->speed*s - (obj->brakes*(100 - obj->brake_pads_wearing)/100)/2 * pow(s,2);
     /*Now reduce speed*/
     obj->speed -= (obj->brakes*obj->brake_pads_wearing/100)*s;
+
+    /*Update also rpm, reduce the rpms by an amount that increases with power of brakes and tyre wearings*/
+    obj->rpm = (obj->speed*5 - obj->brakes*obj->brake_pads_wearing);
 
     if (obj->speed < 0)
         obj->speed = 0;
@@ -130,7 +134,7 @@ void step_sim(bus_t *obj, float s)
 
 uint8_t bus_crashed(bus_t *obj)
 {
-    if (obj->proximity < 0) {
+    if (obj->proximity <= 0) {
         return SIMBUS_CRASHED;
     } else {
         return SIMBUS_OK;

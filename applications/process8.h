@@ -35,8 +35,8 @@ void process8_entry()
     bus_state_t current_state = {0,0,0,0}; //describe the motion state of the bus
     thresholds_t thresholds[7];
     uint8_t road_state = 0; //assume it is dry
-    float brakes;
-    uint8_t i;
+    float brakes = 0;
+    uint8_t i = 0;
 #ifdef SIMBUS
     rt_tick_t last_tick,curr_tick;
     /*Initialize bus*/
@@ -97,7 +97,7 @@ void process8_entry()
             DEBUG_PRINT("Process8 wasn't able to receive mail\n",LIGHT_DEBUG);
             DEBUG_PRINT("Braking for safety reasons\n",LIGHT_DEBUG);
 #ifdef SIMBUS
-            set_brake(&simbus, brakes);
+           // set_brake(&simbus, brakes);
 #endif
             /*Continue with next cycle*/
             continue;
@@ -125,43 +125,47 @@ void process8_entry()
 
         if (current_state.humidity > thresholds[0].humidity_threshold) {
             /*road is dry*/
-            road_state = 0;
+            road_state = 1;
         } else {
             /*road is wet*/
-            road_state = 1;
+            road_state = 0;
         }
 
-        if (current_state.speed < 20)
+        if (current_state.speed < 20/3.6)
             i = 0;
-        else if (current_state.speed < 40)
+        else if (current_state.speed < 40/3.6)
             i = 1;
-        else if (current_state.speed < 60)
+        else if (current_state.speed < 60/3.6)
             i = 2;
-        else if (current_state.speed < 80)
+        else if (current_state.speed < 80/3.6)
             i = 3;
-        else if (current_state.speed < 100)
+        else if (current_state.speed < 100/3.6)
             i = 4;
-        else if (current_state.speed < 120)
+        else if (current_state.speed < 120/3.6)
             i = 5;
         else
             i = 6;
 
         if (current_state.speed > 0 && current_state.rpm > 0) {
             if (current_state.proximity <= thresholds[i].critical_proximity_threshold)      //max braking to avoid fatal crashes
-                        {
-                            //10 m/s^2 max
-                            brakes = 10.0;
-                        }
+                {
+                    //10 m/s^2 max
+                    brakes = 10.0;
+                }
 
-            else if (current_state.proximity < thresholds[i].proximity_threshold[road_state]) {
+            else if (current_state.proximity < thresholds[i].proximity_threshold[road_state])
+            {
 
                 /*brake depending linearly on the proximity and modulated by speed*/
                 brakes = 10.0*((float)(thresholds[i].proximity_threshold[road_state] - current_state.proximity))/((float)(thresholds[i].proximity_threshold[road_state] - thresholds[i].critical_proximity_threshold));
-#ifdef SIMBUS
-                set_brake(&simbus, brakes);
-#endif
             }
-
+            /**TODO brakes should be regulated at each cycle*/
+            else {
+                brakes = 0;
+            }
+#ifdef SIMBUS
+            set_brake(&simbus, brakes);
+#endif
         }
 
         result = rt_mb_send(&p3_mailbox_bis, (rt_uint32_t)&current_state);
@@ -192,7 +196,7 @@ void process8_entry()
         if (bus_is_still(&simbus) == SIMBUS_STILL) {
             rt_kprintf("The bus is still\n");
         }
-        printf("Bus speed: %f m/s and proximity is %u m\n", get_speed(&simbus), get_proximity(&simbus));
+        printf("Bus speed: %f m/s and proximity is %u m, braking at %f\n", get_speed(&simbus), get_proximity(&simbus), get_brake(&simbus));
 
 #endif
     }
