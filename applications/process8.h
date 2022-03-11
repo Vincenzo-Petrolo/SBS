@@ -12,7 +12,7 @@
 #define P8_DEADLINE_TICKS RT_TICK_PER_SECOND/1000*P8_DEADLINE_MS
 #define P8_MB_POOL_SIZE 128
 
-void set_brake(uint8_t value); //between 0 and 10 m/s^2
+void set_brake(float value); //between 0 and 10 m/s^2
 
 typedef struct {
     uint8_t humidity_threshold;
@@ -31,7 +31,7 @@ void process8_entry()
     bus_state_t current_state = {0,0,0,0}; //describe the motion state of the bus
     thresholds_t thresholds[7];
     uint8_t road_state = 0; //assume it is dry
-    uint8_t brakes;
+    float brakes;
     uint8_t i;
 #ifdef DEADLINE_TESTING
     /*Initialize deadline*/
@@ -80,13 +80,12 @@ void process8_entry()
 
         DEBUG_PRINT("Process 8 is waiting for mail\n", HEAVY_DEBUG);
 
-        /**Wait for 3ms at most and then make a decision*/
         result = rt_mb_recv(&p8_mailbox, (rt_ubase_t *)&pointer, RT_WAITING_FOREVER);
 
         if (result != RT_EOK) {
             DEBUG_PRINT("Process8 wasn't able to receive mail\n",LIGHT_DEBUG);
             DEBUG_PRINT("Braking for safety reasons\n",LIGHT_DEBUG);
-            set_brake(255);
+            set_brake(10.0);
 
             /*Continue with next cycle*/
             continue;
@@ -113,7 +112,7 @@ void process8_entry()
         }
 
         //TODO this can be avoided if we haven't updated the humidity value this cycle
-        if (current_state.humidity > thresholds.humidity_threshold) {
+        if (current_state.humidity > thresholds[0].humidity_threshold) {
             /*road is dry*/
             road_state = 0;
         } else {
@@ -140,13 +139,13 @@ void process8_entry()
             if (current_state.proximity <= thresholds[i].critical_proximity_threshold)      //max braking to avoid fatal crashes
                         {
                             //10 m/s^2 max
-                            brakes = 10;
+                            brakes = 10.0;
                         }
 
             else if (current_state.proximity < thresholds[i].proximity_threshold[road_state]) {
 
                 /*brake depending linearly on the proximity and modulated by speed*/
-                brakes = (255-current_state.proximity)*((float)current_state.speed/255);
+                brakes = 10.0*((float)(thresholds[i].proximity_threshold[road_state] - current_state.proximity))/((float)(thresholds[i].proximity_threshold[road_state] - thresholds[i].critical_proximity_threshold));
                 set_brake(brakes);
                 }
 
@@ -171,10 +170,10 @@ void process8_entry()
 
 }
 
-void set_brake(uint8_t value) //between 0 and 10 m/s^2
+void set_brake(float value) //between 0 and 10 m/s^2
 {
 
-    //rt_kprintf("[BRAKING] : %d\n",value);
+    printf("[BRAKING] : %f\n", value);
     return;
 }
 
