@@ -33,10 +33,11 @@ void process8_entry()
     uint32_t *pointer; //declare a pointer to data received
     msg_t *msg;
     bus_state_t current_state = {0,0,0,0}; //describe the motion state of the bus
-    thresholds_t thresholds[7];
+    thresholds_t thresholds[4];
     uint8_t road_state = 0; //assume it is dry
     float brakes = 0;
     uint8_t i = 0;
+    float brake_ratio;
 #ifdef SIMBUS
     rt_tick_t last_tick,curr_tick;
     /*Initialize bus*/
@@ -51,39 +52,24 @@ void process8_entry()
 #endif
 
     thresholds[0].humidity_threshold = 70;
-    thresholds[0].proximity_threshold[0] = 4;
-    thresholds[0].proximity_threshold[1] = 2;
-    thresholds[0].critical_proximity_threshold = 1;
+    thresholds[0].proximity_threshold[0] = 36;
+    thresholds[0].proximity_threshold[1] = 18;
+    thresholds[0].critical_proximity_threshold = 9;
 
     thresholds[1].humidity_threshold = 70;
-    thresholds[1].proximity_threshold[0] = 16;
-    thresholds[1].proximity_threshold[1] = 8;
-    thresholds[1].critical_proximity_threshold = 4;
+    thresholds[1].proximity_threshold[0] = 64;
+    thresholds[1].proximity_threshold[1] = 32;
+    thresholds[1].critical_proximity_threshold = 16;
 
     thresholds[2].humidity_threshold = 70;
-    thresholds[2].proximity_threshold[0] = 36;
-    thresholds[2].proximity_threshold[1] = 18;
-    thresholds[2].critical_proximity_threshold = 9;
+    thresholds[2].proximity_threshold[0] = 100;
+    thresholds[2].proximity_threshold[1] = 50;
+    thresholds[2].critical_proximity_threshold = 25;
 
     thresholds[3].humidity_threshold = 70;
-    thresholds[3].proximity_threshold[0] = 64;
-    thresholds[3].proximity_threshold[1] = 32;
-    thresholds[3].critical_proximity_threshold = 16;
-
-    thresholds[4].humidity_threshold = 70;
-    thresholds[4].proximity_threshold[0] = 100;
-    thresholds[4].proximity_threshold[1] = 50;
-    thresholds[4].critical_proximity_threshold = 25;
-
-    thresholds[5].humidity_threshold = 70;
-    thresholds[5].proximity_threshold[0] = 144;
-    thresholds[5].proximity_threshold[1] = 72;
-    thresholds[5].critical_proximity_threshold = 36;
-
-    thresholds[6].humidity_threshold = 70;
-    thresholds[6].proximity_threshold[0] = 196;
-    thresholds[6].proximity_threshold[1] = 98;
-    thresholds[6].critical_proximity_threshold = 49;
+    thresholds[3].proximity_threshold[0] = 144;
+    thresholds[3].proximity_threshold[1] = 72;
+    thresholds[3].critical_proximity_threshold = 36;
 
     DEBUG_PRINT("process8 started\n", HEAVY_DEBUG);
 
@@ -97,7 +83,7 @@ void process8_entry()
             DEBUG_PRINT("Process8 wasn't able to receive mail\n",LIGHT_DEBUG);
             DEBUG_PRINT("Braking for safety reasons\n",LIGHT_DEBUG);
 #ifdef SIMBUS
-           // set_brake(&simbus, brakes);
+            set_brake(&simbus, brakes);
 #endif
             /*Continue with next cycle*/
             continue;
@@ -124,10 +110,10 @@ void process8_entry()
         }
 
         if (current_state.humidity > thresholds[0].humidity_threshold) {
-            /*road is dry*/
+            /*road is wet*/
             road_state = 0;
         } else {
-            /*road is wet*/
+            /*road is dry*/
             road_state = 1;
         }
 
@@ -139,25 +125,20 @@ void process8_entry()
             i = 2;
         else if (current_state.speed < 80/3.6)
             i = 3;
-        else if (current_state.speed < 100/3.6)
-            i = 4;
-        else if (current_state.speed < 120/3.6)
-            i = 5;
-        else
-            i = 6;
 
-        if (current_state.speed > 0 && current_state.rpm > 0) {
+        if (current_state.speed > 0) {
             if (current_state.proximity <= thresholds[i].critical_proximity_threshold)      //max braking to avoid fatal crashes
                 {
-                    //10 m/s^2 max
-                    brakes = 10.0;
+                    //3 m/s^2 max
+                    brakes = 3.0;
                 }
 
             else if (current_state.proximity < thresholds[i].proximity_threshold[road_state])
             {
 
                 /*brake depending linearly on the proximity and modulated by speed*/
-                brakes = 10.0*((float)(thresholds[i].proximity_threshold[road_state] - current_state.proximity))/((float)(thresholds[i].proximity_threshold[road_state] - thresholds[i].critical_proximity_threshold));
+                brake_ratio = ((float)(thresholds[i].proximity_threshold[road_state] - current_state.proximity))/((float)(thresholds[i].proximity_threshold[road_state] - thresholds[i].critical_proximity_threshold));
+                brakes = 3*brake_ratio;
             }
             else {
                 brakes = 0;
