@@ -82,7 +82,7 @@ void process8_entry()
             DEBUG_PRINT("Process8 wasn't able to receive mail\n",LIGHT_DEBUG);
             DEBUG_PRINT("Braking for safety reasons\n",LIGHT_DEBUG);
 #ifdef SIMBUS
-            set_brake(&simbus, brakes);
+            //set_brake(&simbus, brakes);
 #endif
             /*Continue with next cycle*/
             continue;
@@ -90,23 +90,10 @@ void process8_entry()
 
         msg = (msg_t *) pointer;
 
-        switch (msg->sensor) {
-            case 'R':
-                current_state.rpm = msg->value;
-                break;
-            case 'V':
-                current_state.speed = msg->value;
-                break;
-            case 'H':
-                current_state.humidity = (uint8_t)msg->value;
-                break;
-            case 'P':
-                current_state.proximity = (uint16_t)msg->value;
-                break;
-            default:
-                DEBUG_PRINT("p8 received a value from an unknown sensor\n",LIGHT_DEBUG);
-                break;
-        }
+        current_state.speed = msg->speed;
+        current_state.humidity = msg->humidity;
+        current_state.rpm = msg->rpm;
+        current_state.proximity = msg->proximity;
 
         if (current_state.humidity > thresholds[0].humidity_threshold) {
             /*road is wet*/

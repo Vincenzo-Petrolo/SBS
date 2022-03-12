@@ -2,8 +2,10 @@
 #define __CUSTOM_TYPES__
 
 typedef struct {
-  float value;
-  uint8_t sensor;
+  float speed;
+  float rpm;
+  uint8_t humidity;
+  uint16_t proximity;
 } msg_t;
 
 typedef struct {

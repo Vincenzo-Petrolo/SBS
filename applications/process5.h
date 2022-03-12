@@ -36,57 +36,32 @@ static rt_timer_t timerprox;
 msg_t msg;
 
 
-static void timeoutrpm(void *rpm)
+static void timeoutrpm(void)
 {
-    msg.value = get_rpm(&simbus);
-    msg.sensor = 'R';
-    rt_mb_send_wait(&p6_mailbox, (rt_uint32_t)&msg,100);
-    rt_mb_send_wait(&p8_mailbox, (rt_uint32_t)&msg,100);
-    rt_mb_send_wait(&p4_mailbox, (rt_uint32_t)&msg,100);
-    rt_mb_send_wait(&p7_mailbox, (rt_uint32_t)&msg,100);
+    msg.rpm = get_rpm(&simbus);
 }
-static void timeoutvel(void *vel)
+static void timeoutvel(void)
 {
 #ifdef SIMBUS
     /*Get bus speed*/
-    msg.value = get_speed(&simbus);
-    msg.sensor = 'V';
-    rt_mb_send_wait(&p6_mailbox, (rt_uint32_t)&msg,100);
-    rt_mb_send_wait(&p8_mailbox, (rt_uint32_t)&msg,100);
-    rt_mb_send_wait(&p4_mailbox, (rt_uint32_t)&msg,100);
-    rt_mb_send_wait(&p7_mailbox, (rt_uint32_t)&msg,100);
+    msg.speed = get_speed(&simbus);
 #endif
 }
 
-static void timeouthum(void *hum)
+static void timeouthum(void)
 {
-    msg.value = get_humidity(&simbus);
-    msg.sensor = 'H';
-    rt_mb_send_wait(&p8_mailbox, (rt_uint32_t)&msg,100);
-    rt_mb_send_wait(&p4_mailbox, (rt_uint32_t)&msg,100);
-    rt_mb_send_wait(&p7_mailbox, (rt_uint32_t)&msg,100);
+    msg.humidity = get_humidity(&simbus);
 }
 
-static void timeoutprox(void *prox)
+static void timeoutprox(void)
 {
-    msg.value = get_proximity(&simbus);
-    msg.sensor = 'P';
-    rt_mb_send_wait(&p8_mailbox, (rt_uint32_t)&msg,100);
-    rt_mb_send_wait(&p4_mailbox, (rt_uint32_t)&msg,100);
-    rt_mb_send_wait(&p7_mailbox, (rt_uint32_t)&msg,100);
+    msg.proximity = get_proximity(&simbus);
 }
 
 void process5_entry()
 {
 
-    int rpm; //in rpm 0-400
-    int vel; //in kmh 0-80
-    int hum; //in % 0-100
-    unsigned int prox; //in m 0-20
-    timeouthum(&hum);
-    timeoutprox(&prox);
-    timeoutrpm(&rpm);
-    timeoutvel(&vel);
+
     rt_err_t result;
 #ifdef DEADLINE_TESTING
     /*Initialize deadline*/
@@ -101,19 +76,19 @@ void process5_entry()
     DEBUG_PRINT("process5 started\n", HEAVY_DEBUG);
 
     timerrpm = rt_timer_create("timerrpm", timeoutrpm,
-                                 (void *)&rpm, 50,
+                                 NULL, 50,
                                  RT_TIMER_FLAG_PERIODIC);
 
     timervel = rt_timer_create("timervel", timeoutvel,
-                                (void *)&vel, 50,
+                                NULL, 50,
                                  RT_TIMER_FLAG_PERIODIC);
 
     timerhum = rt_timer_create("timerhum", timeouthum,
-                                (void *)&hum, 1000,
+                                NULL, 1000,
                                  RT_TIMER_FLAG_PERIODIC);
 
     timerprox = rt_timer_create("timerprox", timeoutprox,
-                                (void *)&prox, 50,
+                                NULL, 50,
                                  RT_TIMER_FLAG_PERIODIC);
 
     if (timerrpm != RT_NULL)
@@ -136,8 +111,12 @@ void process5_entry()
         end_news = rt_tick_get();
         //rt_kprintf("\n\n TIME ELAPSED %u\n\n", end_news - start_news);
 #endif
+        rt_mb_send_wait(&p6_mailbox, (rt_uint32_t)&msg,100);
+        rt_mb_send_wait(&p8_mailbox, (rt_uint32_t)&msg,100);
+        rt_mb_send_wait(&p4_mailbox, (rt_uint32_t)&msg,100);
+        rt_mb_send_wait(&p7_mailbox, (rt_uint32_t)&msg,100);
 
-        rt_thread_delay(1000);
+        rt_thread_delay(100);
 
 #ifdef DEADLINE_TESTING
         /*Online deadline testing*/

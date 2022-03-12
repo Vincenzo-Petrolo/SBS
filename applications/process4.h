@@ -59,24 +59,11 @@ void process4_entry(void *param)
         /*Care must be taken on mailbox messages because they are shared pointers and data can change.*/
         msg = (msg_t *) pointer;
 
-        switch (msg->sensor) {
-        case 'V':
-            last_speed = msg->value; //copy the value into a local variable
-            break;
-        case 'R':
-            last_rpm = msg->value;
-            break;
-        case 'H':
-            last_hum = msg->value;
-            break;
-        case 'P':
-            last_prox = msg->value;
-            break;
+        last_speed = msg->speed;
+        last_hum = msg->humidity;
+        last_rpm = msg->rpm;
+        last_prox = msg->proximity;
 
-        default:
-            DEBUG_PRINT("p4 received an unknown sensor",HEAVY_DEBUG);
-            break;
-        }
         send_json(last_rpm, last_speed, last_prox, last_hum);
 #ifdef DEADLINE_TESTING
         /*Online deadline testing*/

@@ -81,9 +81,8 @@ static msg_t can_receive_msg(void)
     static char sensor_name = 'T';
     msg_t received_msg;
 
-    received_msg.sensor = sensor_name;
     /*Randomize the value*/
-    received_msg.value = ((rand()%rt_tick_get()) & 0xFF00000) >> 20;
+    received_msg.speed = ((rand()%rt_tick_get()) & 0xFF00000) >> 20;
 
     if (sensor_name == 'T') {
         sensor_name = 'W';

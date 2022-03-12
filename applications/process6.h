@@ -50,17 +50,8 @@ void process6_entry()
 
             msg = (msg_t *) pointer;
 
-            switch (msg->sensor) {
-                case 'R':
-                    current_rpm = msg->value;
-                    break;
-                case 'V':
-                    current_speed = msg->value;
-                    break;
-                default:
-                    DEBUG_PRINT("p6 received a value from an unknown sensor\n",LIGHT_DEBUG);
-                    break;
-            }
+            current_rpm = msg->rpm;
+            current_speed = msg->speed;
 
             if (current_speed > 10/3.6 && current_rpm == 0) {
                 update_prio6 = 1;
