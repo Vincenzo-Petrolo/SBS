@@ -102,16 +102,19 @@ uint8_t get_people_onboard(bus_t *obj)
     return obj->people_onboard;
 }
 
+#define A 0.5
+#define B 0.3
+#define C 0.2
 void set_brake(bus_t *obj, float b)
 {
 
     obj->brakes = b;
 
     /*Brakes modulation*/
-#if 0
-    obj->brakes *=  (100 - obj->brake_pads_wearing)/100\
-                    *(100 - obj->tyre_pressure)/100\
-                    *(100 - obj->humidity)/100;
+#if 1
+    obj->brakes *=  A*(100 - obj->brake_pads_wearing)/100\
+                    +C*(obj->tyre_pressure)/100\
+                    +B*(100 - obj->humidity)/100;
 #endif
     return;
 }
@@ -129,11 +132,17 @@ void step_sim(bus_t *obj, float s)
     }
 
     /*Now reduce speed*/
-    obj->speed -= (obj->brakes*obj->brake_pads_wearing/100)*s;
+    obj->speed -= (obj->brakes)*s;
 
     /*Update also rpm, reduce the rpms by an amount that increases with power of brakes and tyre wearings*/
-    obj->rpm = (obj->speed*5 - obj->brakes*obj->brake_pads_wearing);
-
+    if (obj->brakes < 2) {
+        obj->rpm = obj->speed*5;
+    }
+    else {
+        if (obj->speed > 35/3.6) {
+            obj->rpm = 0;
+        }
+    }
     if (obj->speed < 0)
         obj->speed = 0;
     if (obj->rpm < 0)
