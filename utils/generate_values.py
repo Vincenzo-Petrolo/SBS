@@ -21,11 +21,6 @@ speed_options = [
     "Custom speed : You choose the value"
 ]
 
-rpm_options = [
-    "Trigger ABS => It will try to trigger the ABS of the system",
-    "Coherent with speed => Wheels are correctly spinning"
-]
-
 brake_pads_wearing_options = [
     "High wearing => Brakes are weared at 90% level",
     "Low wearing => Brakes are weared at 10% level",
@@ -33,8 +28,9 @@ brake_pads_wearing_options = [
 ]
 
 tyre_pressure_options = [
-    "Pressure OK => ",
-    "Low Pressure"
+    "Pressure OK => 90% of the ideal value ",
+    "Low Pressure => 20% of the ideal value",
+    "Custom value => You choose the value in meters"
 ]
 
 people_onboard_options = [
@@ -49,7 +45,6 @@ initial_print = "Welcome to the values generator, please choose options from the
 proximity_value = 0
 humidity_value = 0
 speed_value = 0
-rpm_value = 0
 brake_pads_wearing_value = 0
 tyre_pressure_value = 0
 people_onboard_value = 0
@@ -94,17 +89,6 @@ def scenario_menu():
         speed_value = 30
     print(Fore.GREEN +"Speed set to:" + str(speed_value))
 
-    #choose rpm
-    terminal_menu = TerminalMenu(rpm_options)
-    menu_entry_index = terminal_menu.show()
-    global rpm_value
-    if (menu_entry_index == 0):
-        rpm_value = 1
-        print(Fore.RED +"ABS activation set")
-    else:
-        rpm_value = 0
-        print(Fore.GREEN +"Coherent RPM with speed")
-
     #choose brake pads wearing
     terminal_menu = TerminalMenu(brake_pads_wearing_options)
     menu_entry_index = terminal_menu.show()
@@ -121,12 +105,13 @@ def scenario_menu():
     terminal_menu = TerminalMenu(tyre_pressure_options)
     menu_entry_index = terminal_menu.show()
     global tyre_pressure_value
-    if (menu_entry_index == 0):
-        tyre_pressure_value = 1
-        print(Fore.GREEN +"High pressure set")
+    if (menu_entry_index == 2):
+        tyre_pressure_value = int(input("Insert the custom value: "))
+    elif (menu_entry_index == 0):
+        tyre_pressure_value = 90
     else:
-        tyre_pressure_value = 0
-        print(Fore.RED +"Low pressure set")
+        tyre_pressure_value = 20
+    print(Fore.GREEN +"Tyre pressure set to:" + str(tyre_pressure_value))
 
     # choose no. people onboard
     terminal_menu = TerminalMenu(people_onboard_options)
@@ -149,7 +134,6 @@ def generate_headerfile():
     headerfile.write("unsigned int proximity_start = " + str(proximity_value) + ";\n")
     headerfile.write("unsigned int humidity_value = " + str(humidity_value) + ";\n")
     headerfile.write("unsigned int initial_speed = " + str(speed_value) + ";\n")
-    headerfile.write("unsigned int rpm_value = " + str(rpm_value) + ";\n")
     headerfile.write("unsigned int brake_pads_wearing_value = " + str(brake_pads_wearing_value) + ";\n")
     headerfile.write("unsigned int tyre_pressure_value = " + str(tyre_pressure_value) + ";\n")
     headerfile.write("unsigned int people_onboard = " + str(people_onboard_value) + ";\n")
