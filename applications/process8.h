@@ -91,7 +91,7 @@ void process8_entry()
 
         DEBUG_PRINT("Process 8 is waiting for mail\n", HEAVY_DEBUG);
 
-        result = rt_mb_recv(&p8_mailbox, (rt_ubase_t *)&pointer, RT_WAITING_FOREVER);
+        result = rt_mb_recv(&p8_mailbox, (rt_ubase_t *)&pointer, ms2ticks(3));
 
         if (result != RT_EOK) {
             DEBUG_PRINT("Process8 wasn't able to receive mail\n",LIGHT_DEBUG);
@@ -125,10 +125,10 @@ void process8_entry()
 
         if (current_state.humidity > thresholds[0].humidity_threshold) {
             /*road is dry*/
-            road_state = 1;
+            road_state = 0;
         } else {
             /*road is wet*/
-            road_state = 0;
+            road_state = 1;
         }
 
         if (current_state.speed < 20/3.6)
@@ -195,7 +195,10 @@ void process8_entry()
         if (bus_is_still(&simbus) == SIMBUS_STILL) {
             rt_kprintf("The bus is still\n");
         }
-        printf("Bus speed: %f m/s and proximity is %u m, braking at %f\n", get_speed(&simbus), get_proximity(&simbus), get_brake(&simbus));
+        printf("Bus speed: %.1f m/s and proximity is %.2f m, braking at %.1f, time %.3f s\n",   get_speed(&simbus),
+                                                                                            get_proximity(&simbus),
+                                                                                            get_brake(&simbus),
+                                                                                            get_time(&simbus));
 
 #endif
     }

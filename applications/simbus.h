@@ -11,19 +11,20 @@
 typedef struct {
     /*These values are dynamic*/
     float speed;
-    unsigned int proximity;
+    float proximity;
     uint8_t humidity;
     int rpm;
     uint8_t brake_pads_wearing;
     uint8_t tyre_pressure;
     uint8_t people_onboard;
     float brakes;
+    float time;
 } bus_t;
 
 void bus_init(bus_t *);
 
-void set_proximity(bus_t *,unsigned int);
-unsigned int get_proximity(bus_t *);
+void set_proximity(bus_t *, float);
+float get_proximity(bus_t *);
 
 void set_humidity(bus_t *, uint8_t);
 uint8_t get_humidity(bus_t *);
@@ -51,5 +52,7 @@ void step_sim(bus_t *, float s);
 uint8_t bus_crashed(bus_t *);
 
 uint8_t bus_is_still(bus_t *);
+
+float get_time(bus_t *);
 
 #endif

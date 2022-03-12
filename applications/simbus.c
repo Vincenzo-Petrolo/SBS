@@ -9,21 +9,22 @@ void bus_init(bus_t *obj)
     obj->brake_pads_wearing = brake_pads_wearing_value;
     obj->humidity = humidity_value;
     obj->people_onboard = people_onboard;
-    obj->rpm = rpm_value;
     obj->speed = initial_speed / 3.6;
+    obj->rpm = obj->speed*5;
     obj->tyre_pressure = tyre_pressure_value;
     obj->brakes = 0;
+    obj->time = 0;
 
     return;
 }
 
-void set_proximity(bus_t *obj,unsigned int p)
+void set_proximity(bus_t *obj, float p)
 {
     obj->proximity = p;
 
     return;
 }
-unsigned int get_proximity(bus_t *obj)
+float get_proximity(bus_t *obj)
 {
     return obj->proximity;
 }
@@ -107,6 +108,12 @@ void set_brake(bus_t *obj, float b)
         obj->brakes = 10;
     else obj->brakes = b;
 
+    /*Brakes modulation*/
+#if 0
+    obj->brakes *=  (100 - obj->brake_pads_wearing)/100\
+                    *(100 - obj->tyre_pressure)/100\
+                    *(100 - obj->humidity)/100;
+#endif
     return;
 }
 float get_brake(bus_t * obj)
@@ -118,8 +125,10 @@ float get_brake(bus_t * obj)
 void step_sim(bus_t *obj, float s)
 {
     /*First reduce proximity value by computing distance traveled in s time.*/
-    if (obj->speed > 0)
-        obj->proximity -= obj->speed*s - (obj->brakes*(100 - obj->brake_pads_wearing)/100)/2 * pow(s,2);
+    if (obj->speed > 0) {
+        obj->proximity -= obj->speed*s - obj->brakes/2 * pow(s,2);
+    }
+
     /*Now reduce speed*/
     obj->speed -= (obj->brakes*obj->brake_pads_wearing/100)*s;
 
@@ -128,6 +137,10 @@ void step_sim(bus_t *obj, float s)
 
     if (obj->speed < 0)
         obj->speed = 0;
+    if (obj->rpm < 0)
+        obj->rpm = 0;
+
+    obj->time += s;
 
     return;
 }
@@ -148,4 +161,9 @@ uint8_t bus_is_still(bus_t *obj)
     } else {
         return SIMBUS_MOVING;
     }
+}
+
+float get_time(bus_t *obj)
+{
+    return obj->time;
 }

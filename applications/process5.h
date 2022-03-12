@@ -39,6 +39,8 @@ static rt_timer_t timerrpm;
 static rt_timer_t timervel;
 static rt_timer_t timerhum;
 static rt_timer_t timerprox;
+msg_t msg;
+
 
 static void timeoutrpm(void *rpm)
 {
@@ -67,7 +69,11 @@ static void timeoutprox(void *prox)
 {
     unsigned int *p;
     p = (unsigned int *) prox;
-    *p = get_proximity(&simbus);
+    msg.value = get_proximity(&simbus);
+    msg.sensor = 'P';
+    rt_mb_send_wait(&p8_mailbox, (rt_uint32_t)&msg,100);
+    rt_mb_send_wait(&p4_mailbox, (rt_uint32_t)&msg,100);
+    rt_mb_send_wait(&p7_mailbox, (rt_uint32_t)&msg,100);
 }
 
 void process5_entry()
@@ -81,7 +87,6 @@ void process5_entry()
     timeoutprox(&prox);
     timeoutrpm(&rpm);
     timeoutvel(&vel);
-    msg_t msg;
     rt_err_t result;
 #ifdef DEADLINE_TESTING
     /*Initialize deadline*/
