@@ -18,7 +18,7 @@
 
 
 #define P5_STACK 4096 //4kB
-#define P5_PRIORITY 2 //lower than p8 and p6
+#define P5_PRIORITY 3 //lower than p8 and p6
 #define P5_TSLICE 50
 #define P5_DEADLINE_MS 10 //ms
 #define P5_DEADLINE_TICKS RT_TICK_PER_SECOND/1000*P5_DEADLINE_MS

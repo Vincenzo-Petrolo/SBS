@@ -159,7 +159,6 @@ void process8_entry()
                 /*brake depending linearly on the proximity and modulated by speed*/
                 brakes = 10.0*((float)(thresholds[i].proximity_threshold[road_state] - current_state.proximity))/((float)(thresholds[i].proximity_threshold[road_state] - thresholds[i].critical_proximity_threshold));
             }
-            /**TODO brakes should be regulated at each cycle*/
             else {
                 brakes = 0;
             }
