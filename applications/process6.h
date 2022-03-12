@@ -22,8 +22,8 @@ void process6_entry()
     rt_err_t result;
     uint32_t *pointer; //declare a pointer to data received
     msg_t *msg;
-    uint8_t current_rpm = 0;
-    uint8_t current_speed = 0;
+    float current_rpm = 0;
+    float current_speed = 0;
     uint8_t ABS_state = 0;
     uint8_t update_prio6;
     uint8_t update_prio8;
@@ -62,7 +62,7 @@ void process6_entry()
                     break;
             }
 
-            if (current_speed > 10/3.6 && current_rpm == 0 && ABS_state == 0) {
+            if (current_speed > 10/3.6 && current_rpm == 0) {
                 update_prio6 = 1;
                 update_prio8 = 2;
                 rt_thread_control(rt_thread_self(), RT_THREAD_CTRL_CHANGE_PRIORITY, &update_prio6);

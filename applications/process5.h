@@ -5,7 +5,6 @@
 #include "sbs_configuration.h"
 #include "custom_types.h"
 #include <rtthread.h>
-#include <time.h>
 #include "image_edge.h"
 
 #ifdef SIMBUS
@@ -30,11 +29,6 @@ int image[M*N] = {0};
 
 #endif
 
-int rpm_comp();
-int vel_comp();
-int hum_comp();
-int prox_comp();
-
 static rt_timer_t timerrpm;
 static rt_timer_t timervel;
 static rt_timer_t timerhum;
@@ -44,31 +38,37 @@ msg_t msg;
 
 static void timeoutrpm(void *rpm)
 {
-    int *p;
-    p = (int *) rpm;
-    *p = get_rpm(&simbus);
+    msg.value = get_rpm(&simbus);
+    msg.sensor = 'R';
+    rt_mb_send_wait(&p6_mailbox, (rt_uint32_t)&msg,100);
+    rt_mb_send_wait(&p8_mailbox, (rt_uint32_t)&msg,100);
+    rt_mb_send_wait(&p4_mailbox, (rt_uint32_t)&msg,100);
+    rt_mb_send_wait(&p7_mailbox, (rt_uint32_t)&msg,100);
 }
 static void timeoutvel(void *vel)
 {
-    int *p;
-    p = (int *) vel;
 #ifdef SIMBUS
     /*Get bus speed*/
-    *p = get_speed(&simbus);
+    msg.value = get_speed(&simbus);
+    msg.sensor = 'V';
+    rt_mb_send_wait(&p6_mailbox, (rt_uint32_t)&msg,100);
+    rt_mb_send_wait(&p8_mailbox, (rt_uint32_t)&msg,100);
+    rt_mb_send_wait(&p4_mailbox, (rt_uint32_t)&msg,100);
+    rt_mb_send_wait(&p7_mailbox, (rt_uint32_t)&msg,100);
 #endif
 }
 
 static void timeouthum(void *hum)
 {
-    int *p;
-    p = (int *) hum;
-    *p = get_humidity(&simbus);
+    msg.value = get_humidity(&simbus);
+    msg.sensor = 'H';
+    rt_mb_send_wait(&p8_mailbox, (rt_uint32_t)&msg,100);
+    rt_mb_send_wait(&p4_mailbox, (rt_uint32_t)&msg,100);
+    rt_mb_send_wait(&p7_mailbox, (rt_uint32_t)&msg,100);
 }
 
 static void timeoutprox(void *prox)
 {
-    unsigned int *p;
-    p = (unsigned int *) prox;
     msg.value = get_proximity(&simbus);
     msg.sensor = 'P';
     rt_mb_send_wait(&p8_mailbox, (rt_uint32_t)&msg,100);
@@ -136,53 +136,6 @@ void process5_entry()
         end_news = rt_tick_get();
         //rt_kprintf("\n\n TIME ELAPSED %u\n\n", end_news - start_news);
 #endif
-        if (rpm != -1) {
-            msg.value = rpm;
-            msg.sensor = 'R';
-            result = rt_mb_send_wait(&p6_mailbox, (rt_uint32_t)&msg,100);
-            result = rt_mb_send_wait(&p8_mailbox, (rt_uint32_t)&msg,100);
-            result = rt_mb_send_wait(&p4_mailbox, (rt_uint32_t)&msg,100);
-            result = rt_mb_send_wait(&p7_mailbox, (rt_uint32_t)&msg,100);
-
-            DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
-        }
-
-        if (vel != -1) {
-            msg.value = vel;
-            msg.sensor = 'V';
-            result = rt_mb_send_wait(&p6_mailbox, (rt_uint32_t)&msg,100);
-            result = rt_mb_send_wait(&p8_mailbox, (rt_uint32_t)&msg,100);
-            result = rt_mb_send_wait(&p4_mailbox, (rt_uint32_t)&msg,100);
-            result = rt_mb_send_wait(&p7_mailbox, (rt_uint32_t)&msg,100);
-
-            DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
-        }
-
-        if (hum != -1) {
-            msg.value = hum;
-            msg.sensor = 'H';
-            result = rt_mb_send_wait(&p8_mailbox, (rt_uint32_t)&msg,100);
-            result = rt_mb_send_wait(&p4_mailbox, (rt_uint32_t)&msg,100);
-            result = rt_mb_send_wait(&p7_mailbox, (rt_uint32_t)&msg,100);
-
-            DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
-        }
-
-        if (prox != -1) {
-            msg.value = prox;
-            msg.sensor = 'P';
-            result = rt_mb_send_wait(&p8_mailbox, (rt_uint32_t)&msg,100);
-            result = rt_mb_send_wait(&p4_mailbox, (rt_uint32_t)&msg,100);
-            result = rt_mb_send_wait(&p7_mailbox, (rt_uint32_t)&msg,100);
-
-            DEBUG_PRINT("Process 5 is sending a mail\n", HEAVY_DEBUG);
-        }
-
-        if (result != RT_EOK) {
-            DEBUG_PRINT("Process5 wasn't able to send mail\n",LIGHT_DEBUG);
-            /*Continue with next cycle*/
-            continue;
-        }
 
         rt_thread_delay(1000);
 
@@ -201,28 +154,5 @@ void process5_entry()
     }
     return;
 }
-
-    int rpm_comp() {
-
-        return rand()%401;
-    }
-
-    int vel_comp() {
-
-        return rand()%81;
-
-    }
-
-    int hum_comp() {
-
-        return rand()%101;
-
-    }
-
-    int prox_comp() {
-
-        return rand()%21;
-
-    }
 
 #endif

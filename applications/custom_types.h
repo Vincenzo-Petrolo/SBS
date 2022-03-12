@@ -2,14 +2,14 @@
 #define __CUSTOM_TYPES__
 
 typedef struct {
-  uint16_t value;
+  float value;
   uint8_t sensor;
 } msg_t;
 
 typedef struct {
     /*Received through sensors using normal protocols*/
-    uint8_t speed;
-    uint16_t rpm;
+    float speed;
+    float rpm;
     uint8_t humidity;
     uint16_t proximity;
     /*Received through CAN*/

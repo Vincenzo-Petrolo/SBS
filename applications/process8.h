@@ -98,10 +98,10 @@ void process8_entry()
                 current_state.speed = msg->value;
                 break;
             case 'H':
-                current_state.humidity = msg->value;
+                current_state.humidity = (uint8_t)msg->value;
                 break;
             case 'P':
-                current_state.proximity = msg->value;
+                current_state.proximity = (uint16_t)msg->value;
                 break;
             default:
                 DEBUG_PRINT("p8 received a value from an unknown sensor\n",LIGHT_DEBUG);
