@@ -215,7 +215,7 @@ int main() {
         return 1;
     }
 
-    rt_thread_t process8_thread = rt_thread_create("process8",
+     process8_thread = rt_thread_create("process8",
                                                     process8_entry,
                                                     NULL,
                                                     P8_STACK,

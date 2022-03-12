@@ -5,6 +5,10 @@
 #include "custom_types.h"
 #include <rtthread.h>
 
+#ifdef SIMBUS
+#include "simbus.h"
+#endif
+
 #define P6_STACK 4096 //4kB
 #define P6_PRIORITY 2 //highest priority
 #define P6_TSLICE 10
@@ -21,6 +25,8 @@ void process6_entry()
     uint8_t current_rpm = 0;
     uint8_t current_speed = 0;
     uint8_t ABS_state = 0;
+    uint8_t update_prio6;
+    uint8_t update_prio8;
 
 #ifdef DEADLINE_TESTING
     /*Initialize deadline*/
@@ -56,12 +62,26 @@ void process6_entry()
                     break;
             }
 
-            if (current_speed > 10 && current_rpm == 0) {
+            if (current_speed > 10/3.6 && current_rpm == 0 && ABS_state == 0) {
+                update_prio6 = 1;
+                update_prio8 = 2;
+                rt_thread_control(rt_thread_self(), RT_THREAD_CTRL_CHANGE_PRIORITY, &update_prio6);
+                rt_thread_control(process8_thread, RT_THREAD_CTRL_CHANGE_PRIORITY, &update_prio8);
                 ABS_state = 1;
-                //rt_kprintf("[ABS ACTIVE]\n");
+                rt_kprintf("[ABS ACTIVE]\n");
+                set_brake(&simbus, get_brake(&simbus)/2);
+                printf("Bus speed: %.1f m/s and proximity is %.2f m, braking at %.1f, time %.3f s\n",   get_speed(&simbus),
+                                                                                                    get_proximity(&simbus),
+                                                                                                    get_brake(&simbus),
+                                                                                                    get_time(&simbus));
             }
-            else {
+            else if (ABS_state == 1){
+                update_prio6 = 2;
+                update_prio8 = 1;
+                rt_thread_control(process8_thread, RT_THREAD_CTRL_CHANGE_PRIORITY, &update_prio8);
+                rt_thread_control(rt_thread_self(), RT_THREAD_CTRL_CHANGE_PRIORITY, &update_prio6);
                 ABS_state = 0;
+                rt_kprintf("[ABS INACTIVE]\n");
             }
 
 #ifdef DEADLINE_TESTING

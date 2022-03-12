@@ -2,7 +2,9 @@
 #define __SBS_CONFIGURATION__
 
 #include <stdio.h>
+#include <rtthread.h>
 #include "cpu_usage.h"
+#include "simbus.h"
 /*Debug levels to be used as the lvl parameter for the macro DEBUG_PRINT*/
 #define HEAVY_DEBUG 3
 #define MODERATE_DEBUG 2
@@ -20,6 +22,9 @@
 //#define BENCHMARKING
 /*****************END CONFIGURATION**************/
 
+#ifdef SIMBUS
+bus_t simbus;
+#endif
 
 #define DEBUG_PRINT(string, lvl) \
     if (lvl <= DEBUG_LEVEL) {\
@@ -34,6 +39,8 @@
 
 struct rt_mailbox p8_mailbox, p6_mailbox, p4_mailbox, p3_mailbox, p2_mailbox, p3_mailbox_bis, p7_mailbox;
 
+rt_thread_t process8_thread;
+
 char shared_mem1to3[32 + 1], shared_mem3to2[32 + 1];
 
 struct rt_semaphore sem_lock;
@@ -43,8 +50,6 @@ const struct dfs_mount_tbl mount_table[] =
     {"sd0", "/", "elm", 0, 0},
     {0}
 };
-
-
 
 #ifdef DEADLINE_TESTING
 

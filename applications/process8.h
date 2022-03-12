@@ -6,7 +6,6 @@
 
 #ifdef SIMBUS
 #include "simbus.h"
-bus_t simbus;
 #endif
 
 #include <rtthread.h>
