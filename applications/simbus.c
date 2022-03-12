@@ -104,9 +104,8 @@ uint8_t get_people_onboard(bus_t *obj)
 
 void set_brake(bus_t *obj, float b)
 {
-    if (obj->brakes > 10)
-        obj->brakes = 10;
-    else obj->brakes = b;
+
+    obj->brakes = b;
 
     /*Brakes modulation*/
 #if 0
