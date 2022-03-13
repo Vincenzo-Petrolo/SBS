@@ -45,11 +45,12 @@ static void hook_of_scheduler_light(struct rt_thread* from, struct rt_thread* to
     rt_kprintf("%s -> %s\n", from->name, to->name);
 }
 
-
 int main() {
 
     rt_err_t result;
     srand(time(NULL));
+    list_mem();
+
 
 #ifndef DEADLINE_TESTING
 
@@ -282,6 +283,8 @@ int main() {
         rt_kprintf("[ERORR] : process 8 failed to start\n");
         return 1;
     }
+
+    list_mem();
 
     return 0;
 }
