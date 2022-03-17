@@ -49,10 +49,9 @@ int main() {
 
     rt_err_t result;
     srand(time(NULL));
-    list_mem();
 
 
-#ifndef DEADLINE_TESTING
+#ifdef DEADLINE_TESTING
 
     fd = open("timings.csv",  O_TRUNC);
     close(fd);
@@ -64,12 +63,13 @@ int main() {
      * use all the bandwidth during the preemption moments and cause
      * all other tasks to miss their deadlines.*/
 #if DEBUG_LEVEL != NO_DEBUG
-    rt_scheduler_sethook(hook_of_scheduler_light);
+    rt_scheduler_sethook(hook_of_scheduler);
 #endif
 
 #endif
 
 #ifdef BENCHMARKING
+    list_mem();
     /*Initialize the module*/
     cpu_usage_init();
     /*Let the system run for a given amount of ms, then get benchmarks*/
@@ -78,7 +78,6 @@ int main() {
                                                 NULL,
                                                 ms2ticks(1000* 10),
                                                 RT_TIMER_FLAG_ONE_SHOT);
-    /*Start the timer*/
     if (cpu_load_timer != NULL)
         rt_timer_start(cpu_load_timer);
 #endif
@@ -284,7 +283,8 @@ int main() {
         return 1;
     }
 
+#ifdef BENCHMARKING
     list_mem();
-
+#endif
     return 0;
 }

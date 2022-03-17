@@ -12,8 +12,8 @@
 #include "process8.h"
 #endif
 
-#define M 500
-#define N 400
+#define M 400
+#define N 1000
 
 
 #define P5_STACK 4096 //4kB
@@ -116,7 +116,6 @@ void process5_entry()
         rt_mb_send_wait(&p4_mailbox, (rt_uint32_t)&msg,100);
         rt_mb_send_wait(&p7_mailbox, (rt_uint32_t)&msg,100);
 
-        rt_thread_delay(100);
 
 #ifdef DEADLINE_TESTING
         /*Online deadline testing*/
@@ -129,7 +128,6 @@ void process5_entry()
             next_deadline = get_next_deadline(next_deadline, P5_DEADLINE_TICKS);
         }
 #endif
-
     }
     return;
 }

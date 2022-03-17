@@ -82,7 +82,22 @@ void process8_entry()
             DEBUG_PRINT("Process8 wasn't able to receive mail\n",LIGHT_DEBUG);
             DEBUG_PRINT("Braking for safety reasons\n",LIGHT_DEBUG);
 #ifdef SIMBUS
-            //set_brake(&simbus, brakes);
+            curr_tick = rt_tick_get();
+            /*Step the simulation*/
+            step_sim(&simbus, (float)ticks2ms((curr_tick-last_tick))/1000);
+            last_tick = curr_tick;
+
+            /*Check bus conditions*/
+            if (bus_crashed(&simbus) == SIMBUS_CRASHED) {
+                rt_kprintf("[EMERGENCY] The bus crashed!!!\n");
+            }
+            if (bus_is_still(&simbus) == SIMBUS_STILL) {
+                rt_kprintf("The bus is still\n");
+            }
+            printf("Bus speed: %.1f m/s and proximity is %.2f m, braking at %.1f, time %.3f s\n",   get_speed(&simbus),
+                                                                                                get_proximity(&simbus),
+                                                                                                get_brake(&simbus),
+                                                                                                get_time(&simbus));
 #endif
             /*Continue with next cycle*/
             continue;
@@ -123,7 +138,8 @@ void process8_entry()
             {
 
                 /*brake depending linearly on the proximity and modulated by speed*/
-                brake_ratio = ((float)(thresholds[i].proximity_threshold[road_state] - current_state.proximity))/((float)(thresholds[i].proximity_threshold[road_state] - thresholds[i].critical_proximity_threshold));
+                brake_ratio = ((float)(thresholds[i].proximity_threshold[road_state] - current_state.proximity))\
+                /((float)(thresholds[i].proximity_threshold[road_state] - thresholds[i].critical_proximity_threshold));
                 brakes = 3*brake_ratio;
             }
             else {

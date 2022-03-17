@@ -12,11 +12,11 @@
 #define NO_DEBUG 0 /*Don't use this with the macro DEBUG_PRINT!!!*/
 
 /*Define the global debug level*/
-#define DEBUG_LEVEL NO_DEBUG
+#define DEBUG_LEVEL LIGHT_DEBUG
 
 
 /*****************CONFIGURATION******************/
-//#define DEADLINE_TESTING
+#define DEADLINE_TESTING
 //#define OVERLOAD_TESTING
 #define SIMBUS
 #define BENCHMARKING
@@ -53,6 +53,9 @@ const struct dfs_mount_tbl mount_table[] =
 
 #ifdef DEADLINE_TESTING
 
+
+uint32_t missed_deadlines_count = 0;
+
 /**
  * Function tools created for online
  * deadline checks.
@@ -70,7 +73,7 @@ uint8_t check_deadline(rt_tick_t next_deadline)
     rt_tick_t curr_time = rt_tick_get();
 
     if (curr_time > next_deadline) {
-
+        missed_deadlines_count++;
         return DEADLINE_MISS;
     }
 
@@ -107,12 +110,18 @@ void print_cpu_load_results(void)
 
     printf("\n================================================");
     printf(
-            "Total idle time: %d\n"\
-            "Average CPU load: %.2f%%\n",
+            "\nTotal idle time: %d\n"\
+            "Average CPU load: %.2f%%\n",\
                                         ticks2ms(infos->idle_stat[0].idle_tick),
                                         cpu_average_load
                                         );
+#ifdef DEADLINE_TESTING
+    printf("Missed deadlines number: %u\n", missed_deadlines_count);
+#endif
+
     printf("\n================================================");
+
+
 
     return;
 }
