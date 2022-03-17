@@ -16,7 +16,7 @@
 
 
 /*****************CONFIGURATION******************/
-//#define DEADLINE_TESTING
+#define DEADLINE_TESTING
 //#define OVERLOAD_TESTING
 #define SIMBUS
 #define BENCHMARKING
@@ -99,7 +99,9 @@ int ticks2ms(uint64_t ticks)
 
 #ifdef BENCHMARKING
 
-void print_cpu_load_results(void)
+uint8_t missed_deadlines_count = 0;
+
+void print_benchmarks_results(void)
 {
 
     float cpu_average_load = cpu_load_average();
@@ -112,7 +114,10 @@ void print_cpu_load_results(void)
                                         ticks2ms(infos->idle_stat[0].idle_tick),
                                         cpu_average_load
                                         );
-    printf("\n================================================");
+#ifdef DEADLINE_TESTING
+    printf("Number of missed deadlines: %u\n", missed_deadlines_count);
+#endif
+    printf("\n================================================\n");
 
     return;
 }

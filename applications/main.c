@@ -49,8 +49,9 @@ int main() {
 
     rt_err_t result;
     srand(time(NULL));
+#ifdef BENCHMARKING
     list_mem();
-
+#endif
 
 #ifndef DEADLINE_TESTING
 
@@ -73,14 +74,14 @@ int main() {
     /*Initialize the module*/
     cpu_usage_init();
     /*Let the system run for a given amount of ms, then get benchmarks*/
-    rt_timer_t cpu_load_timer = rt_timer_create("benchamrk_timer",
-                                                &print_cpu_load_results,
+    rt_timer_t benchamrks_timer = rt_timer_create("benchamrks_timer",
+                                                &print_benchmarks_results,
                                                 NULL,
                                                 ms2ticks(1000* 10),
                                                 RT_TIMER_FLAG_ONE_SHOT);
     /*Start the timer*/
-    if (cpu_load_timer != NULL)
-        rt_timer_start(cpu_load_timer);
+    if (benchamrks_timer != NULL)
+        rt_timer_start(benchamrks_timer);
 #endif
 
     rt_sem_init(&sem_lock, "lock", 1, RT_IPC_FLAG_FIFO);
@@ -284,7 +285,9 @@ int main() {
         return 1;
     }
 
-    list_mem();
+    #ifdef BENCHMARKING
+        list_mem();
+    #endif
 
     return 0;
 }

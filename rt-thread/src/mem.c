@@ -326,7 +326,7 @@ void *rt_malloc(rt_size_t size)
                  * remainder must be large enough to contain MIN_SIZE_ALIGNED data: if
                  * mem->next - (ptr + (2*SIZEOF_STRUCT_MEM)) == size,
                  * struct heap_mem would fit in but no data between mem2 and mem2->next
-                 *  we could leave out MIN_SIZE_ALIGNED. We would create an empty
+                 *  todo we could leave out MIN_SIZE_ALIGNED. We would create an empty
                  *       region that couldn't hold data, but when mem->next gets freed,
                  *       the 2 regions would be combined, resulting in more free memory
                  */
@@ -639,6 +639,7 @@ void list_mem(void)
     rt_kprintf("total memory: %d\n", mem_size_aligned);
     rt_kprintf("needed memory : %d\n", needed_mem);
     rt_kprintf("used memory : %d\n", used_mem);
+    rt_kprintf("byte of internal fragmentation: %d\n", used_mem-needed_mem);
     rt_kprintf("maximum allocated memory: %d\n", max_mem);
 }
 FINSH_FUNCTION_EXPORT(list_mem, list memory usage information)

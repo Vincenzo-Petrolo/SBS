@@ -12,7 +12,7 @@
 #include "process8.h"
 #endif
 
-#define M 500
+#define M 1000
 #define N 400
 
 
@@ -109,19 +109,19 @@ void process5_entry()
         start_news = rt_tick_get();
         free(news(M, N, image));
         end_news = rt_tick_get();
-        //rt_kprintf("\n\n TIME ELAPSED %u\n\n", end_news - start_news);
 #endif
         rt_mb_send_wait(&p6_mailbox, (rt_uint32_t)&msg,100);
         rt_mb_send_wait(&p8_mailbox, (rt_uint32_t)&msg,100);
         rt_mb_send_wait(&p4_mailbox, (rt_uint32_t)&msg,100);
         rt_mb_send_wait(&p7_mailbox, (rt_uint32_t)&msg,100);
 
-        rt_thread_delay(100);
-
 #ifdef DEADLINE_TESTING
         /*Online deadline testing*/
         if (check_deadline(next_deadline) == DEADLINE_MISS) {
             rt_kprintf("[!!WARNING!!] Process 5 missed the deadline!\n");
+#ifdef BENCHMARKING
+            missed_deadlines_count++;
+#endif
         }
 
         if (rt_tick_get() > curr_deadline) {
