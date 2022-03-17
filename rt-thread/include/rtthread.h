@@ -36,8 +36,12 @@ extern "C" {
 #ifdef OSES_KERNEL_FIX
 /* Global variable telling if scheduler hook was called */
 extern uint8_t scheduler_hook_parent_call;
-
 #endif
+
+#ifdef KERNEL_FORCE_RECURSION
+extern uint8_t write_slowdown;
+#endif
+
 /**
  * @addtogroup KernelObject
  */

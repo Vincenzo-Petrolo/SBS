@@ -88,6 +88,31 @@ int dfs_init(void)
 }
 INIT_PREV_EXPORT(dfs_init);
 
+
+#ifdef OSES_KERNEL_FIX
+rt_err_t dfs_lock(void)
+{
+    rt_err_t result = -RT_EBUSY;
+
+    while (result == -RT_EBUSY)
+    {
+        if (scheduler_hook_parent_call == 0) {
+            result = rt_mutex_take(&fslock, RT_WAITING_FOREVER);
+        } else {
+            result = rt_mutex_take(&fslock, RT_WAITING_NO);
+        }
+
+        if (result == -RT_ETIMEOUT && scheduler_hook_parent_call == 1) {
+            return -RT_ETIMEOUT;
+        }
+    }
+    if (result != RT_EOK)
+    {
+        RT_ASSERT(0);
+    }
+}
+#else
+
 /**
  * this function will lock device file system.
  *
@@ -106,6 +131,7 @@ void dfs_lock(void)
         RT_ASSERT(0);
     }
 }
+#endif
 
 /**
  * this function will lock device file system.
@@ -176,10 +202,19 @@ int fd_new(void)
     struct dfs_fd *d;
     int idx;
     struct dfs_fdtable *fdt;
+    rt_err_t result;
 
     fdt = dfs_fdtable_get();
+#ifdef OSES_KERNEL_FIX
     /* lock filesystem */
-    dfs_lock();
+    result = dfs_lock();
+#endif
+
+#ifdef OSES_KERNEL_FIX
+    if (result == -RT_ETIMEOUT) {
+        return -1;
+    }
+#endif
 
     /* find an empty fd entry */
     idx = fd_alloc(fdt, 0);
@@ -214,6 +249,7 @@ struct dfs_fd *fd_get(int fd)
 {
     struct dfs_fd *d;
     struct dfs_fdtable *fdt;
+    rt_err_t result;
 
 #if defined(RT_USING_DFS_DEVFS) && defined(RT_USING_POSIX)
     if ((0 <= fd) && (fd <= 2))
@@ -225,7 +261,15 @@ struct dfs_fd *fd_get(int fd)
     if (fd < 0 || fd >= (int)fdt->maxfd)
         return NULL;
 
-    dfs_lock();
+#ifdef OSES_KERNEL_FIX
+    /* lock filesystem */
+    result = dfs_lock();
+#endif
+#ifdef OSES_KERNEL_FIX
+    if (result == -RT_ETIMEOUT) {
+        return NULL;
+    }
+#endif
     d = fdt->fds[fd];
 
     /* check dfs_fd valid or not */
@@ -250,9 +294,19 @@ struct dfs_fd *fd_get(int fd)
 void fd_put(struct dfs_fd *fd)
 {
     RT_ASSERT(fd != NULL);
+    rt_err_t result;
 
+#ifdef OSES_KERNEL_FIX
+    /* lock filesystem */
+    result = dfs_lock();
+#else
     dfs_lock();
-
+#endif
+#ifdef OSES_KERNEL_FIX
+    if (result == -RT_ETIMEOUT) {
+        return;
+    }
+#endif
     fd->ref_count --;
 
     /* clear this fd entry */

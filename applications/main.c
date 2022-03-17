@@ -222,15 +222,6 @@ int main() {
         return 1;
     }
 
-#if 0
-    rt_err_t p6_startup_error = rt_thread_startup(process6_thread);
-
-    if (p6_startup_error == RT_ERROR) {
-        rt_kprintf("[ERORR] : process 6 failed to start\n");
-
-        return 1;
-    }
-#endif
 
     rt_err_t p8_startup_error = rt_thread_startup(process8_thread);
 
@@ -240,13 +231,6 @@ int main() {
         return 1;
     }
 
-    rt_err_t p4_startup_error = rt_thread_startup(process4_thread);
-
-    if (p4_startup_error == RT_ERROR) {
-        rt_kprintf("[ERORR] : process 4 failed to start\n");
-
-        return 1;
-    }
 
     rt_err_t p5_startup_error = rt_thread_startup(process5_thread);
 
@@ -256,35 +240,6 @@ int main() {
         return 1;
     }
 
-    rt_err_t p3_startup_error = rt_thread_startup(process3_thread);
-
-    if (p3_startup_error == RT_ERROR) {
-        rt_kprintf("[ERORR] : process 3 failed to start\n");
-
-        return 1;
-    }
-
-    rt_err_t p1_startup_error = rt_thread_startup(process1_thread);
-
-    if (p1_startup_error == RT_ERROR) {
-        rt_kprintf("[ERORR] : process 1 failed to start\n");
-
-        return 1;
-    }
-    rt_err_t p2_startup_error = rt_thread_startup(process2_thread);
-
-    if (p2_startup_error == RT_ERROR) {
-        rt_kprintf("[ERORR] : process 2 failed to start\n");
-
-        return 1;
-    }
-    rt_err_t p7_startup_error = rt_thread_startup(process7_thread);
-
-    if (p7_startup_error == RT_ERROR) {
-        rt_kprintf("[ERORR] : process 7 failed to start\n");
-
-        return 1;
-    }
 
     return 0;
 }

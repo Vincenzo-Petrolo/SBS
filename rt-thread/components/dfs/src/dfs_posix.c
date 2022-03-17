@@ -12,6 +12,11 @@
 #include <dfs.h>
 #include <dfs_posix.h>
 #include "dfs_private.h"
+#include <rtthread.h>
+
+#ifdef KERNEL_FORCE_RECURSION
+uint8_t write_slowdown = 0;
+#endif
 
 /**
  * @addtogroup FsPosixApi
@@ -162,9 +167,9 @@ int write(int fd, const void *buf, size_t len)
 {
     int result;
     struct dfs_fd *d;
-
     /* get the fd */
     d = fd_get(fd);
+
     if (d == NULL)
     {
         rt_set_errno(-EBADF);

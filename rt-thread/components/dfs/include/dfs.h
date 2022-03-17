@@ -93,7 +93,11 @@ int dfs_init(void);
 char *dfs_normalize_path(const char *directory, const char *filename);
 const char *dfs_subdir(const char *directory, const char *filename);
 
+#ifdef OSES_KERNEL_FIX
+rt_err_t dfs_lock(void);
+#else
 void dfs_lock(void);
+#endif
 void dfs_unlock(void);
 
 /* FD APIs */

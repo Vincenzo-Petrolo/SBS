@@ -756,7 +756,6 @@ __again:
                 if (scheduler_hook_parent_call != 1) {
                     /*If not coming from a hook scheduler
                      * parent call, then schedule*/
-                    rt_kprintf("Scheduling on lock unavailable\n");
                     rt_schedule();
                 } else {
                     rt_kprintf("Sorry I can't schedule, you coming from hook of scheduler\n");
