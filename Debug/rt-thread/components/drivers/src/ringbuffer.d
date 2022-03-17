@@ -43,7 +43,8 @@ rt-thread/components/drivers/src/ringbuffer.o: \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/sdio.h \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/sdio_func_ids.h \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/watchdog.h \
- C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h
+ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h \
+ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/can.h
 
 C:\OSES_project\SBS\rtconfig_preinc.h:
 
@@ -132,3 +133,5 @@ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/sdio_func_ids.h
 C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/watchdog.h:
 
 C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h:
+
+C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/can.h:

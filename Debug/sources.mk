@@ -36,6 +36,7 @@ rt-thread/components/dfs/filesystems/elmfat/option \
 rt-thread/components/dfs/filesystems/ramfs \
 rt-thread/components/dfs/filesystems/romfs \
 rt-thread/components/dfs/src \
+rt-thread/components/drivers/can \
 rt-thread/components/drivers/i2c \
 rt-thread/components/drivers/misc \
 rt-thread/components/drivers/mtd \
@@ -56,17 +57,7 @@ rt-thread/components/libc/termios \
 rt-thread/components/libc/time \
 rt-thread/components/lwp/arch/arm/cortex-a \
 rt-thread/components/lwp \
-rt-thread/components/net/lwip-2.0.2/src/api \
-rt-thread/components/net/lwip-2.0.2/src/apps/ping \
-rt-thread/components/net/lwip-2.0.2/src/arch \
-rt-thread/components/net/lwip-2.0.2/src/core \
-rt-thread/components/net/lwip-2.0.2/src/core/ipv4 \
-rt-thread/components/net/lwip-2.0.2/src/netif \
 rt-thread/components/net/netdev/src \
-rt-thread/components/net/sal_socket/dfs_net \
-rt-thread/components/net/sal_socket/impl \
-rt-thread/components/net/sal_socket/socket \
-rt-thread/components/net/sal_socket/src \
 rt-thread/libcpu/arm/common \
 rt-thread/libcpu/arm/cortex-a \
 rt-thread/src \

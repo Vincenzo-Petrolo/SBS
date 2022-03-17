@@ -14,74 +14,16 @@
 
 
 
-int rpm_comp();
-int vel_comp();
-int hum_comp();
-int prox_comp();
-
-static rt_timer_t timerrpm;
-static rt_timer_t timervel;
-static rt_timer_t timerhum;
-static rt_timer_t timerprox;
-
-static void timeoutrpm(void *rpm)
-{
-    int *p;
-    p = (int *) rpm;
-    *p = rpm_comp();
-}
-static void timeoutvel(void *vel)
-{
-    int *p;
-    p = (int *) vel;
-    *p = vel_comp();
-}
-
-static void timeouthum(void *hum)
-{
-    int *p;
-    p = (int *) hum;
-    *p = hum_comp();
-}
-
-static void timeoutprox(void *prox)
-{
-    int *p;
-    p = (int *) prox;
-    *p = prox_comp();
-}
-
 void process5_entry()
 {
+    int a;
 
     while (1) {
         rt_kprintf("Doing stuff\n");
-        int a = 1+1;
+        a = 1+1;
+        rt_thread_delay(10);
     }
     return;
 }
-
-    int rpm_comp() {
-
-        return rand()%401;
-    }
-
-    int vel_comp() {
-
-        return rand()%81;
-
-    }
-
-    int hum_comp() {
-
-        return rand()%101;
-
-    }
-
-    int prox_comp() {
-
-        return rand()%21;
-
-    }
 
 #endif

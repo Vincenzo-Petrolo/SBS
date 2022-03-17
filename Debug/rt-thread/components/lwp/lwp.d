@@ -47,6 +47,7 @@ rt-thread/components/lwp/lwp.o: ../rt-thread/components/lwp/lwp.c \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/sdio_func_ids.h \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/watchdog.h \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h \
+ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/can.h \
  C:\OSES_project\SBS\rt-thread\components\dfs\include/dfs_fs.h \
  ../rt-thread/components/lwp/lwp.h \
  C:\OSES_project\SBS\rt-thread\components\lwp/lwp_memheap.h \
@@ -147,6 +148,8 @@ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/sdio_func_ids.h
 C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/watchdog.h:
 
 C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h:
+
+C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/can.h:
 
 C:\OSES_project\SBS\rt-thread\components\dfs\include/dfs_fs.h:
 

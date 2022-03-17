@@ -44,6 +44,7 @@ rt-thread/components/drivers/spi/spi_flash_sfud.o: \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/sdio_func_ids.h \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/watchdog.h \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h \
+ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/can.h \
  ../rt-thread/components/drivers/spi/spi_flash.h \
  ../rt-thread/components/drivers/spi/spi_flash_sfud.h \
  ../rt-thread/components/drivers/spi/./sfud/inc/sfud.h \
@@ -140,6 +141,8 @@ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/sdio_func_ids.h
 C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/watchdog.h:
 
 C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h:
+
+C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/can.h:
 
 ../rt-thread/components/drivers/spi/spi_flash.h:
 

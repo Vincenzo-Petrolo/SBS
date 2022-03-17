@@ -47,6 +47,7 @@ rt-thread/components/libc/compilers/newlib/syscalls.o: \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/sdio_func_ids.h \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/watchdog.h \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h \
+ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/can.h \
  C:\OSES_project\SBS\rt-thread\components\dfs\include/dfs_fs.h \
  C:\OSES_project\SBS\rt-thread\components\libc\pthreads/pthread.h \
  C:\OSES_project\SBS\rt-thread\components\libc\pthreads/posix_types.h \
@@ -146,6 +147,8 @@ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/sdio_func_ids.h
 C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/watchdog.h:
 
 C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h:
+
+C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/can.h:
 
 C:\OSES_project\SBS\rt-thread\components\dfs\include/dfs_fs.h:
 

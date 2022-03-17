@@ -6,17 +6,8 @@
 
 #include "sbs_configuration.h"
 #include "process5.h"
-#include "process6.h"
 #include "process8.h"
-#include "process4.h"
-#include "process3.h"
-#include "process1.h"
-#include "process2.h"
-#include "process7.h"
 
-/*Visible to this file only*/
-static uint8_t p8_mb_pool[P8_MB_POOL_SIZE], p6_mb_pool[P6_MB_POOL_SIZE],p4_mb_pool[P4_MB_POOL_SIZE], p3_mb_pool[2*sizeof(external_state_t)],
-p2_mb_pool[P2_MB_POOL_SIZE],p3_mb_pool_bis[P3_MB_POOL_SIZE], p7_mb_pool[P7_MB_POOL_SIZE];
 
 static int fd = -1; //at begininning no file is open
 
@@ -54,76 +45,6 @@ int main() {
     rt_sem_init(&sem_lock, "lock", 1, RT_IPC_FLAG_FIFO);
 
     /*TOOD use for loops to initialize everything in order to avoid huge file which affects readability*/
-    result  = rt_mb_init(&p8_mailbox, "p8mb", &p8_mb_pool, P8_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
-
-    if (result != RT_EOK) {
-        rt_kprintf("[ERROR] : unable to initialize mailbox P8\n");
-
-        return 1;
-    }
-
-    result  = rt_mb_init(&p6_mailbox, "p6mb", &p6_mb_pool, P6_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
-
-    if (result != RT_EOK) {
-        rt_kprintf("[ERROR] : unable to initialize mailbox P6\n");
-
-        return 1;
-    }
-
-    result  = rt_mb_init(&p4_mailbox, "p4mb", &p4_mb_pool, P4_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
-
-    if (result != RT_EOK) {
-            rt_kprintf("[ERROR] : unable to initialize mailbox P4\n");
-
-            return 1;
-    }
-
-    /*The mailbox for process 3, is using only two entries, one for the new value and one for receiving a new value*/
-    result  = rt_mb_init(&p3_mailbox, "p3mb", &p3_mb_pool, 2*sizeof(external_state_t), RT_IPC_FLAG_FIFO);
-
-    if (result != RT_EOK) {
-            rt_kprintf("[ERROR] : unable to initialize mailbox P3\n");
-
-            return 1;
-    }
-
-    result  = rt_mb_init(&p3_mailbox_bis, "p3mbbis", &p3_mb_pool_bis, P3_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
-
-    if (result != RT_EOK) {
-            rt_kprintf("[ERROR] : unable to initialize mailbox P3 bis\n");
-
-            return 1;
-    }
-
-    result  = rt_mb_init(&p2_mailbox, "p2mb", &p2_mb_pool, P2_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
-
-    if (result != RT_EOK) {
-            rt_kprintf("[ERROR] : unable to initialize mailbox P2\n");
-
-            return 1;
-    }
-    result  = rt_mb_init(&p7_mailbox, "p7mb", &p7_mb_pool, P7_MB_POOL_SIZE/4, RT_IPC_FLAG_FIFO);
-
-    if (result != RT_EOK) {
-            rt_kprintf("[ERROR] : unable to initialize mailbox P2\n");
-
-            return 1;
-    }
-
-    /*All threads creation*/
-    rt_thread_t process3_thread = rt_thread_create("process3",
-                                                    process3_entry,
-                                                    NULL,
-                                                    P3_STACK,
-                                                    P3_PRIORITY,
-                                                    P3_TSLICE);
-
-
-    if (process3_thread == RT_NULL) {
-        rt_kprintf("[ERROR] : process5 failed to create\n");
-
-        return 1;
-    }
 
     rt_thread_t process5_thread = rt_thread_create("process5",
                                                     process5_entry,
@@ -139,19 +60,7 @@ int main() {
         return 1;
     }
 
-    rt_thread_t process6_thread = rt_thread_create("process6",
-                                                        process6_entry,
-                                                        NULL,
-                                                        P6_STACK,
-                                                        P6_PRIORITY,
-                                                        P6_TSLICE);
 
-
-    if (process6_thread == RT_NULL) {
-        rt_kprintf("[ERROR] : process6 failed to create\n");
-
-        return 1;
-    }
 
     rt_thread_t process8_thread = rt_thread_create("process8",
                                                     process8_entry,
@@ -162,62 +71,6 @@ int main() {
 
     if (process8_thread == RT_NULL) {
         rt_kprintf("[ERROR] : process8 failed to create\n");
-
-        return 1;
-    }
-
-    rt_thread_t process4_thread = rt_thread_create("process4",
-                                                    process4_entry,
-                                                    NULL,
-                                                    P4_STACK,
-                                                    P4_PRIORITY,
-                                                    P4_TSLICE);
-
-
-    if (process4_thread == RT_NULL) {
-        rt_kprintf("[ERROR] : process4 failed to create\n");
-
-        return 1;
-    }
-
-    rt_thread_t process1_thread = rt_thread_create("process1",
-                                                        process1_entry,
-                                                        NULL,
-                                                        P1_STACK,
-                                                        P1_PRIORITY,
-                                                        P1_TSLICE);
-
-
-    if (process1_thread == RT_NULL) {
-        rt_kprintf("[ERROR] : process1 failed to create\n");
-
-        return 1;
-    }
-
-    rt_thread_t process2_thread = rt_thread_create("process2",
-                                                        process2_entry,
-                                                        NULL,
-                                                        P2_STACK,
-                                                        P2_PRIORITY,
-                                                        P2_TSLICE);
-
-
-    if (process2_thread == RT_NULL) {
-        rt_kprintf("[ERROR] : process2 failed to create\n");
-
-        return 1;
-    }
-
-    rt_thread_t process7_thread = rt_thread_create("process7",
-                                                            process7_entry,
-                                                            NULL,
-                                                            P7_STACK,
-                                                            P7_PRIORITY,
-                                                            P7_TSLICE);
-
-
-    if (process7_thread == RT_NULL) {
-        rt_kprintf("[ERROR] : process2 failed to create\n");
 
         return 1;
     }

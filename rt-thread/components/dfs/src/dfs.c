@@ -100,11 +100,13 @@ rt_err_t dfs_lock(void)
             result = rt_mutex_take(&fslock, RT_WAITING_FOREVER);
         } else {
             result = rt_mutex_take(&fslock, RT_WAITING_NO);
+
+            if (result == -RT_ETIMEOUT) {
+                return -RT_ETIMEOUT;
+            }
         }
 
-        if (result == -RT_ETIMEOUT && scheduler_hook_parent_call == 1) {
-            return -RT_ETIMEOUT;
-        }
+
     }
     if (result != RT_EOK)
     {
@@ -208,12 +210,12 @@ int fd_new(void)
 #ifdef OSES_KERNEL_FIX
     /* lock filesystem */
     result = dfs_lock();
-#endif
 
-#ifdef OSES_KERNEL_FIX
     if (result == -RT_ETIMEOUT) {
         return -1;
     }
+#else
+    dfs_lock();
 #endif
 
     /* find an empty fd entry */
@@ -264,12 +266,29 @@ struct dfs_fd *fd_get(int fd)
 #ifdef OSES_KERNEL_FIX
     /* lock filesystem */
     result = dfs_lock();
-#endif
-#ifdef OSES_KERNEL_FIX
     if (result == -RT_ETIMEOUT) {
         return NULL;
     }
+#else
+    dfs_lock();
 #endif
+
+    /*I could be preempted after this dfs_lock() for any reason
+     * If coming from process 8, i force the thread to be
+     * suspended in favor of another thread. Therefore, the scheduler
+     * hook will be executed, but it won't be able to get the lock
+     * because the fs is still locked by process8.*/
+    static int flag = 0;
+    if (strncmp(rt_thread_self()->name, "process8", rt_strlen("process8")) == 0 && flag == 0) {
+        /*Sleep for 100ms and set the flag for avoid sleeping again if called from process8*/
+        flag = 1;
+        rt_thread_delay(100);
+    } else if (strncmp(rt_thread_self()->name, "process8", rt_strlen("process8")) != 0) {
+        /*If this is called from another thread different from process 8, then reset the flag*/
+        flag = 0;
+    }
+
+
     d = fdt->fds[fd];
 
     /* check dfs_fd valid or not */

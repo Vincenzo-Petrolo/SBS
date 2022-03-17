@@ -44,6 +44,7 @@ drivers/serial.o: ../drivers/serial.c \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/sdio_func_ids.h \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/watchdog.h \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h \
+ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/can.h \
  ../drivers/serial.h C:\OSES_project\SBS\drivers/board.h \
  C:\OSES_project\SBS\drivers/realview.h \
  C:\OSES_project\SBS\rt-thread\libcpu\arm\cortex-a/armv7.h \
@@ -139,6 +140,8 @@ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/sdio_func_ids.h
 C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/watchdog.h:
 
 C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h:
+
+C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/can.h:
 
 ../drivers/serial.h:
 

@@ -46,6 +46,7 @@ rt-thread/components/lwp/lwp_syscall.o: \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/sdio_func_ids.h \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/watchdog.h \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h \
+ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/can.h \
  C:\OSES_project\SBS\rt-thread\components\lwp/lwp_memheap.h \
  C:\OSES_project\SBS\rt-thread\components\lwp/lwp_mem.h \
  C:\OSES_project\SBS\rt-thread\components\lwp/lwp_syscall.h \
@@ -55,10 +56,6 @@ rt-thread/components/lwp/lwp_syscall.o: \
  C:\OSES_project\SBS\rt-thread\components\dfs\include/dfs_poll.h \
  C:\OSES_project\SBS\rt-thread\components\dfs\include/dfs_select.h \
  C:\OSES_project\SBS\rt-thread\include/libc/libc_fdset.h \
- C:\OSES_project\SBS\rt-thread\components\net\sal_socket\include\socket\sys_socket/sys/socket.h \
- C:\OSES_project\SBS\rt-thread\components\net\sal_socket\include/sal_socket.h \
- C:\OSES_project\SBS\rt-thread\components\net\netdev\include/arpa/inet.h \
- C:\OSES_project\SBS\rt-thread\components\net\netdev\include/netdev_ipaddr.h \
  C:\OSES_project\SBS\rt-thread\include/rtdbg.h
 
 C:\OSES_project\SBS\rtconfig_preinc.h:
@@ -153,6 +150,8 @@ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/watchdog.h:
 
 C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h:
 
+C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/can.h:
+
 C:\OSES_project\SBS\rt-thread\components\lwp/lwp_memheap.h:
 
 C:\OSES_project\SBS\rt-thread\components\lwp/lwp_mem.h:
@@ -170,13 +169,5 @@ C:\OSES_project\SBS\rt-thread\components\dfs\include/dfs_poll.h:
 C:\OSES_project\SBS\rt-thread\components\dfs\include/dfs_select.h:
 
 C:\OSES_project\SBS\rt-thread\include/libc/libc_fdset.h:
-
-C:\OSES_project\SBS\rt-thread\components\net\sal_socket\include\socket\sys_socket/sys/socket.h:
-
-C:\OSES_project\SBS\rt-thread\components\net\sal_socket\include/sal_socket.h:
-
-C:\OSES_project\SBS\rt-thread\components\net\netdev\include/arpa/inet.h:
-
-C:\OSES_project\SBS\rt-thread\components\net\netdev\include/netdev_ipaddr.h:
 
 C:\OSES_project\SBS\rt-thread\include/rtdbg.h:

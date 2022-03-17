@@ -47,6 +47,7 @@ rt-thread/components/libc/mmap/posix_mmap.o: \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/sdio_func_ids.h \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/watchdog.h \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h \
+ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/can.h \
  C:\OSES_project\SBS\rt-thread\components\dfs\include/dfs_fs.h \
  C:\OSES_project\SBS\rt-thread\components\libc\compilers\newlib/sys/mman.h
 
@@ -143,6 +144,8 @@ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/sdio_func_ids.h
 C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/watchdog.h:
 
 C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h:
+
+C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/can.h:
 
 C:\OSES_project\SBS\rt-thread\components\dfs\include/dfs_fs.h:
 

@@ -46,6 +46,7 @@ rt-thread/components/drivers/sdio/block_dev.o: \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/sdio_func_ids.h \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/watchdog.h \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h \
+ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/can.h \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/mmcsd_core.h \
  C:\OSES_project\SBS\rt-thread\include/rtdbg.h
 
@@ -140,6 +141,8 @@ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/sdio_func_ids.h
 C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/watchdog.h:
 
 C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h:
+
+C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/can.h:
 
 C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/mmcsd_core.h:
 

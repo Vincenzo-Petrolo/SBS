@@ -11,17 +11,7 @@ RM := rm -rf
 -include rt-thread/src/subdir.mk
 -include rt-thread/libcpu/arm/cortex-a/subdir.mk
 -include rt-thread/libcpu/arm/common/subdir.mk
--include rt-thread/components/net/sal_socket/src/subdir.mk
--include rt-thread/components/net/sal_socket/socket/subdir.mk
--include rt-thread/components/net/sal_socket/impl/subdir.mk
--include rt-thread/components/net/sal_socket/dfs_net/subdir.mk
 -include rt-thread/components/net/netdev/src/subdir.mk
--include rt-thread/components/net/lwip-2.0.2/src/netif/subdir.mk
--include rt-thread/components/net/lwip-2.0.2/src/core/ipv4/subdir.mk
--include rt-thread/components/net/lwip-2.0.2/src/core/subdir.mk
--include rt-thread/components/net/lwip-2.0.2/src/arch/subdir.mk
--include rt-thread/components/net/lwip-2.0.2/src/apps/ping/subdir.mk
--include rt-thread/components/net/lwip-2.0.2/src/api/subdir.mk
 -include rt-thread/components/lwp/arch/arm/cortex-a/subdir.mk
 -include rt-thread/components/lwp/subdir.mk
 -include rt-thread/components/libc/time/subdir.mk
@@ -42,6 +32,7 @@ RM := rm -rf
 -include rt-thread/components/drivers/mtd/subdir.mk
 -include rt-thread/components/drivers/misc/subdir.mk
 -include rt-thread/components/drivers/i2c/subdir.mk
+-include rt-thread/components/drivers/can/subdir.mk
 -include rt-thread/components/dfs/src/subdir.mk
 -include rt-thread/components/dfs/filesystems/romfs/subdir.mk
 -include rt-thread/components/dfs/filesystems/ramfs/subdir.mk

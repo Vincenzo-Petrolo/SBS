@@ -42,7 +42,8 @@ rt-thread/src/device.o: ../rt-thread/src/device.c \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/sdio.h \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/sdio_func_ids.h \
  C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/watchdog.h \
- C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h
+ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h \
+ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/can.h
 
 C:\OSES_project\SBS\rtconfig_preinc.h:
 
@@ -131,3 +132,5 @@ C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/sdio_func_ids.h
 C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/watchdog.h:
 
 C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/pin.h:
+
+C:\OSES_project\SBS\rt-thread\components\drivers\include/drivers/can.h:
