@@ -54,6 +54,8 @@
 
 /* #define RT_MEM_DEBUG */
 #define RT_MEM_STATS
+#define RT_USING_MEMTRACE
+#define RT_USING_FINSH
 
 #if defined (RT_USING_HEAP) && defined (RT_USING_SMALL_MEM)
 #ifdef RT_USING_HOOK
@@ -134,7 +136,7 @@ static struct rt_semaphore heap_sem;
 static rt_size_t mem_size_aligned;
 
 #ifdef RT_MEM_STATS
-static rt_size_t used_mem, max_mem;
+static rt_size_t needed_mem, used_mem, max_mem;
 #endif
 #ifdef RT_USING_MEMTRACE
 rt_inline void rt_mem_setname(struct heap_mem *mem, const char *name)
@@ -283,7 +285,9 @@ void *rt_malloc(rt_size_t size)
         RT_DEBUG_LOG(RT_DEBUG_MEM, ("malloc size %d, but align to %d\n",
                                     size, RT_ALIGN(size, RT_ALIGN_SIZE)));
     else
-        RT_DEBUG_LOG(RT_DEBUG_MEM, ("malloc size %d\n", size));
+        //RT_DEBUG_LOG(RT_DEBUG_MEM, ("malloc size %d\n", size));
+
+        rt_kprintf("malloc size %d\n", size);
 
     /* alignment size */
     size = RT_ALIGN(size, RT_ALIGN_SIZE);
@@ -322,7 +326,7 @@ void *rt_malloc(rt_size_t size)
                  * remainder must be large enough to contain MIN_SIZE_ALIGNED data: if
                  * mem->next - (ptr + (2*SIZEOF_STRUCT_MEM)) == size,
                  * struct heap_mem would fit in but no data between mem2 and mem2->next
-                 * @todo we could leave out MIN_SIZE_ALIGNED. We would create an empty
+                 *  todo we could leave out MIN_SIZE_ALIGNED. We would create an empty
                  *       region that couldn't hold data, but when mem->next gets freed,
                  *       the 2 regions would be combined, resulting in more free memory
                  */
@@ -348,8 +352,9 @@ void *rt_malloc(rt_size_t size)
                 }
 #ifdef RT_MEM_STATS
                 used_mem += (size + SIZEOF_STRUCT_MEM);
-                if (max_mem < used_mem)
+                if(max_mem < used_mem)
                     max_mem = used_mem;
+                needed_mem += size;
 #endif
             }
             else
@@ -364,8 +369,9 @@ void *rt_malloc(rt_size_t size)
                 mem->used = 1;
 #ifdef RT_MEM_STATS
                 used_mem += mem->next - ((rt_uint8_t *)mem - heap_ptr);
-                if (max_mem < used_mem)
+                if(max_mem < used_mem)
                     max_mem = used_mem;
+                needed_mem += size;
 #endif
             }
             /* set memory block magic */
@@ -395,7 +401,9 @@ void *rt_malloc(rt_size_t size)
                          ("allocate memory at 0x%x, size: %d\n",
                           (rt_ubase_t)((rt_uint8_t *)mem + SIZEOF_STRUCT_MEM),
                           (rt_ubase_t)(mem->next - ((rt_uint8_t *)mem - heap_ptr))));
-
+            rt_kprintf("allocate memory at 0x%x, size: %d\n",
+                          (rt_ubase_t)((rt_uint8_t *)mem + SIZEOF_STRUCT_MEM),
+                      (rt_ubase_t)(mem->next - ((rt_uint8_t *)mem - heap_ptr)));
             RT_OBJECT_HOOK_CALL(rt_malloc_hook,
                                 (((void *)((rt_uint8_t *)mem + SIZEOF_STRUCT_MEM)), size));
 
@@ -601,6 +609,7 @@ void rt_free(void *rmem)
 
 #ifdef RT_MEM_STATS
     used_mem -= (mem->next - ((rt_uint8_t *)mem - heap_ptr));
+    needed_mem -= (mem->next - ((rt_uint8_t *)mem - heap_ptr));
 #endif
 
     /* finally, see if prev or next are free also */
@@ -628,7 +637,9 @@ void rt_memory_info(rt_uint32_t *total,
 void list_mem(void)
 {
     rt_kprintf("total memory: %d\n", mem_size_aligned);
+    rt_kprintf("needed memory : %d\n", needed_mem);
     rt_kprintf("used memory : %d\n", used_mem);
+    rt_kprintf("byte of internal fragmentation: %d\n", used_mem-needed_mem);
     rt_kprintf("maximum allocated memory: %d\n", max_mem);
 }
 FINSH_FUNCTION_EXPORT(list_mem, list memory usage information)

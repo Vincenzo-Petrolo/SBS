@@ -6,9 +6,9 @@
 #include <rtthread.h>
 #include <tiny_aes.h>
 
-#define P3_STACK 4096 //1kB
+#define P3_STACK 4096 //4kB
 #define P3_PRIORITY 3 //lower than hard real time tasks
-#define P3_TSLICE 10 //TODO verify if this is ok
+#define P3_TSLICE 10
 #define P3_DEADLINE_MS 25 //ms
 #define P3_DEADLINE_TICKS RT_TICK_PER_SECOND/1000*P3_DEADLINE_MS
 #define P3_MB_POOL_SIZE 128
@@ -34,7 +34,7 @@ void process3_entry()
 
         /*Wait for a given amount of time, if no message incoming then
          * continue checking for other messages*/
-        result = rt_mb_recv(&p3_mailbox, (rt_ubase_t *)&encrypted_value, 1000);
+        result = rt_mb_recv(&p3_mailbox, (rt_ubase_t *)&encrypted_value, 25);
 
         if (result != RT_EOK) {
             DEBUG_PRINT("Process 3 wasn't able to receive mail\n",LIGHT_DEBUG);
@@ -42,7 +42,7 @@ void process3_entry()
             received_external_values = decrypt(encrypted_value);
         }
 
-        result = rt_mb_recv(&p3_mailbox_bis, (rt_ubase_t *)&internal_bus_status, 1000);
+        result = rt_mb_recv(&p3_mailbox_bis, (rt_ubase_t *)&internal_bus_status, 25);
 
         if (result != RT_EOK) {
             DEBUG_PRINT("Process 3 wasn't able to receive mail from process 5\n",LIGHT_DEBUG);
@@ -55,6 +55,9 @@ void process3_entry()
         /*Online deadline testing*/
         if (check_deadline(next_deadline) == DEADLINE_MISS) {
             rt_kprintf("[!!WARNING!!] Process 3 missed the deadline!\n");
+#ifdef BENCHMARKING
+            missed_deadlines_count++;
+#endif
         }
 
         if (rt_tick_get() > curr_deadline) {
