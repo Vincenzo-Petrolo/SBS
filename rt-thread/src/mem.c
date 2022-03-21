@@ -100,6 +100,7 @@ struct heap_mem
     /* magic and used flag */
     rt_uint16_t magic;
     rt_uint16_t used;
+
 #ifdef ARCH_CPU_64BIT
     rt_uint32_t resv;
 #endif
@@ -124,7 +125,7 @@ static struct heap_mem *heap_end;
 #ifdef ARCH_CPU_64BIT
 #define MIN_SIZE 24
 #else
-#define MIN_SIZE 12
+#define MIN_SIZE 4
 #endif
 
 #define MIN_SIZE_ALIGNED     RT_ALIGN(MIN_SIZE, RT_ALIGN_SIZE)
@@ -271,6 +272,8 @@ void rt_system_heap_init(void *begin_addr, void *end_addr)
  *
  * @return pointer to allocated memory or NULL if no free memory was found.
  */
+
+
 void *rt_malloc(rt_size_t size)
 {
     rt_size_t ptr, ptr2;
@@ -281,16 +284,21 @@ void *rt_malloc(rt_size_t size)
 
     RT_DEBUG_NOT_IN_INTERRUPT;
 
-    if (size != RT_ALIGN(size, RT_ALIGN_SIZE))
+    if (size != RT_ALIGN(size, RT_ALIGN_SIZE)) {
         RT_DEBUG_LOG(RT_DEBUG_MEM, ("malloc size %d, but align to %d\n",
                                     size, RT_ALIGN(size, RT_ALIGN_SIZE)));
-    else
-        //RT_DEBUG_LOG(RT_DEBUG_MEM, ("malloc size %d\n", size));
+        rt_kprintf("malloc size %d, but align to %d\n", size, RT_ALIGN(size, RT_ALIGN_SIZE));
 
+    }
+
+    else {
+        //RT_DEBUG_LOG(RT_DEBUG_MEM, ("malloc size %d\n", size));
         rt_kprintf("malloc size %d\n", size);
+    }
 
     /* alignment size */
-    size = RT_ALIGN(size, RT_ALIGN_SIZE);
+    //size = RT_ALIGN(size, RT_ALIGN_SIZE);         //removed alignment to occupy less space in blocks
+    needed_mem += size;
 
     if (size > mem_size_aligned)
     {
@@ -318,7 +326,7 @@ void *rt_malloc(rt_size_t size)
              * mem->next - (ptr + SIZEOF_STRUCT_MEM) gives us the 'user data size' of mem */
 
             if (mem->next - (ptr + SIZEOF_STRUCT_MEM) >=
-                (size + SIZEOF_STRUCT_MEM + MIN_SIZE_ALIGNED))
+                (size + SIZEOF_STRUCT_MEM))
             {
                 /* (in addition to the above, we test if another struct heap_mem (SIZEOF_STRUCT_MEM) containing
                  * at least MIN_SIZE_ALIGNED of data also fits in the 'user data space' of 'mem')
@@ -343,7 +351,7 @@ void *rt_malloc(rt_size_t size)
 #endif
 
                 /* and insert it between mem and mem->next */
-                mem->next = ptr2;
+                mem->next = ptr2 ;
                 mem->used = 1;
 
                 if (mem2->next != mem_size_aligned + SIZEOF_STRUCT_MEM)
@@ -354,7 +362,6 @@ void *rt_malloc(rt_size_t size)
                 used_mem += (size + SIZEOF_STRUCT_MEM);
                 if(max_mem < used_mem)
                     max_mem = used_mem;
-                needed_mem += size;
 #endif
             }
             else
@@ -371,7 +378,6 @@ void *rt_malloc(rt_size_t size)
                 used_mem += mem->next - ((rt_uint8_t *)mem - heap_ptr);
                 if(max_mem < used_mem)
                     max_mem = used_mem;
-                needed_mem += size;
 #endif
             }
             /* set memory block magic */
@@ -388,7 +394,11 @@ void *rt_malloc(rt_size_t size)
                 /* Find next free block after mem and update lowest free pointer */
                 while (lfree->used && lfree != heap_end)
                     lfree = (struct heap_mem *)&heap_ptr[lfree->next];
-
+                    rt_kprintf("\n%u\n", RT_ALIGN(size, RT_ALIGN_SIZE) - size);
+                for (int i = 0; i < RT_ALIGN(size, RT_ALIGN_SIZE) - size; i++) {        //the idea was to replace the memory cells which were used for alignement with empty spaces
+                    if (lfree != heap_end)                                              //but lfree -> next would bring to the last block and then to heap_end in one iteration
+                        lfree++;
+                }
                 RT_ASSERT(((lfree == heap_end) || (!lfree->used)));
             }
 
