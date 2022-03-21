@@ -69,6 +69,9 @@ void process4_entry(void *param)
         /*Online deadline testing*/
         if (check_deadline(next_deadline) == DEADLINE_MISS) {
             rt_kprintf("[!!WARNING!!] Process 4 missed the deadline!\n");
+#ifdef BENCHMARKING
+            missed_deadlines_count++;
+#endif
         }
 
         if (rt_tick_get() > curr_deadline) {

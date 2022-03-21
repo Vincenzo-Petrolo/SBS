@@ -102,7 +102,9 @@ int ticks2ms(uint64_t ticks)
 
 #ifdef BENCHMARKING
 
-void print_cpu_load_results(void)
+uint8_t missed_deadlines_count = 0;
+
+void print_benchmarks_results(void)
 {
 
     float cpu_average_load = cpu_load_average();
@@ -116,10 +118,9 @@ void print_cpu_load_results(void)
                                         cpu_average_load
                                         );
 #ifdef DEADLINE_TESTING
-    printf("Missed deadlines number: %u\n", missed_deadlines_count);
+    printf("Number of missed deadlines: %u\n", missed_deadlines_count);
 #endif
-
-    printf("\n================================================");
+    printf("\n================================================\n");
 
 
 
